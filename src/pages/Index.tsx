@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Courses from '@/components/Courses';
@@ -8,27 +7,13 @@ import About from '@/components/About';
 import Footer from '@/components/Footer';
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState('home');
-
-  const renderActiveSection = () => {
-    switch (activeSection) {
-      case 'home':
-        return <Hero setActiveSection={setActiveSection} />;
-      case 'courses':
-        return <Courses />;
-      case 'ai-assistant':
-        return <AIAssistant />;
-      case 'about':
-        return <About />;
-      default:
-        return <Hero setActiveSection={setActiveSection} />;
-    }
-  };
-
   return (
     <div className="min-h-screen">
-      <Header activeSection={activeSection} setActiveSection={setActiveSection} />
-      {renderActiveSection()}
+      <Header />
+      <Hero />
+      <Courses />
+      <AIAssistant />
+      <About />
       <Footer />
     </div>
   );

@@ -2,13 +2,9 @@
 import { ArrowRight, BookOpen, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface HeroProps {
-  setActiveSection?: (section: string) => void;
-}
-
-const Hero = ({ setActiveSection }: HeroProps) => {
+const Hero = () => {
   return (
-    <section className="bg-gradient-to-br from-cerulean-50 to-cactus-50 py-20 min-h-[calc(100vh-4rem)]">
+    <section id="home" className="bg-gradient-to-br from-cerulean-50 to-cactus-50 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center animate-fade-in">
           <h1 className="text-4xl md:text-6xl font-bold text-cactus-800 mb-6">
@@ -25,7 +21,6 @@ const Hero = ({ setActiveSection }: HeroProps) => {
             <Button 
               size="lg" 
               className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
-              onClick={() => setActiveSection?.('courses')}
             >
               Start Learning
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -34,7 +29,6 @@ const Hero = ({ setActiveSection }: HeroProps) => {
               variant="outline" 
               size="lg" 
               className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg"
-              onClick={() => setActiveSection?.('ai-assistant')}
             >
               Try AI Assistant
               <Bot className="ml-2 h-5 w-5" />
