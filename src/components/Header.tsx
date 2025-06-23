@@ -3,8 +3,25 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const Header = () => {
+interface HeaderProps {
+  activeSection: string;
+  setActiveSection: (section: string) => void;
+}
+
+const Header = ({ activeSection, setActiveSection }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    { id: 'home', label: 'Home' },
+    { id: 'courses', label: 'Courses' },
+    { id: 'ai-assistant', label: 'AI Assistant' },
+    { id: 'about', label: 'About' },
+  ];
+
+  const handleNavClick = (sectionId: string) => {
+    setActiveSection(sectionId);
+    setIsMenuOpen(false);
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -25,18 +42,19 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#home" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-              Home
-            </a>
-            <a href="#courses" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-              Courses
-            </a>
-            <a href="#ai-assistant" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-              AI Assistant
-            </a>
-            <a href="#about" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-              About
-            </a>
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`transition-colors ${
+                  activeSection === item.id
+                    ? 'text-cerulean-600 font-semibold'
+                    : 'text-cactus-700 hover:text-cerulean-600'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
             <Button className="bg-cerulean-600 hover:bg-cerulean-700 text-white">
               Get Started
             </Button>
@@ -57,18 +75,19 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <div className="flex flex-col space-y-4">
-              <a href="#home" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-                Home
-              </a>
-              <a href="#courses" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-                Courses
-              </a>
-              <a href="#ai-assistant" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-                AI Assistant
-              </a>
-              <a href="#about" className="text-cactus-700 hover:text-cerulean-600 transition-colors">
-                About
-              </a>
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`text-left transition-colors ${
+                    activeSection === item.id
+                      ? 'text-cerulean-600 font-semibold'
+                      : 'text-cactus-700 hover:text-cerulean-600'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
               <Button className="bg-cerulean-600 hover:bg-cerulean-700 text-white w-fit">
                 Get Started
               </Button>
