@@ -2,25 +2,40 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
+  onAuthRequired: () => void;
 }
 
-const Header = ({ activeSection, setActiveSection }: HeaderProps) => {
+const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { id: 'home', label: 'Home' },
-    { id: 'courses', label: 'Courses' },
-    { id: 'ai-assistant', label: 'AI Assistant' },
+    { id: 'courses', label: 'Courses', requiresAuth: true },
+    { id: 'ai-assistant', label: 'AI Assistant', requiresAuth: true },
     { id: 'about', label: 'About' },
   ];
 
-  const handleNavClick = (sectionId: string) => {
+  const handleNavClick = (sectionId: string, requiresAuth?: boolean) => {
+    if (requiresAuth && !isAuthenticated) {
+      onAuthRequired();
+      return;
+    }
     setActiveSection(sectionId);
     setIsMenuOpen(false);
+  };
+
+  const handleGetStartedClick = () => {
+    if (isAuthenticated) {
+      setActiveSection('courses');
+    } else {
+      onAuthRequired();
+    }
   };
 
   return (
@@ -45,7 +60,7 @@ const Header = ({ activeSection, setActiveSection }: HeaderProps) => {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => handleNavClick(item.id)}
+                onClick={() => handleNavClick(item.id, item.requiresAuth)}
                 className={`transition-colors ${
                   activeSection === item.id
                     ? 'text-cerulean-600 font-semibold'
@@ -55,9 +70,26 @@ const Header = ({ activeSection, setActiveSection }: HeaderProps) => {
                 {item.label}
               </button>
             ))}
-            <Button className="bg-cerulean-600 hover:bg-cerulean-700 text-white">
-              Get Started
-            </Button>
+            
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-cactus-600">Welcome, {user?.name}</span>
+                <Button 
+                  variant="outline"
+                  onClick={logout}
+                  className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                onClick={handleGetStartedClick}
+                className="bg-cerulean-600 hover:bg-cerulean-700 text-white"
+              >
+                Get Started
+              </Button>
+            )}
           </nav>
 
           {/* Mobile menu button */}
@@ -78,7 +110,7 @@ const Header = ({ activeSection, setActiveSection }: HeaderProps) => {
               {navItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => handleNavClick(item.id)}
+                  onClick={() => handleNavClick(item.id, item.requiresAuth)}
                   className={`text-left transition-colors ${
                     activeSection === item.id
                       ? 'text-cerulean-600 font-semibold'
@@ -88,9 +120,26 @@ const Header = ({ activeSection, setActiveSection }: HeaderProps) => {
                   {item.label}
                 </button>
               ))}
-              <Button className="bg-cerulean-600 hover:bg-cerulean-700 text-white w-fit">
-                Get Started
-              </Button>
+              
+              {isAuthenticated ? (
+                <div className="flex flex-col space-y-2">
+                  <span className="text-sm text-cactus-600">Welcome, {user?.name}</span>
+                  <Button 
+                    variant="outline"
+                    onClick={logout}
+                    className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 w-fit"
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  onClick={handleGetStartedClick}
+                  className="bg-cerulean-600 hover:bg-cerulean-700 text-white w-fit"
+                >
+                  Get Started
+                </Button>
+              )}
             </div>
           </div>
         )}

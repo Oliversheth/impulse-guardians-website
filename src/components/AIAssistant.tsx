@@ -3,35 +3,18 @@ import { Bot, MessageCircle, Calculator, TrendingUp, PiggyBank } from 'lucide-re
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { siteContent } from '@/data/siteContent';
 
-const features = [
-  {
-    icon: Calculator,
-    title: "Budget Creator",
-    description: "AI-powered budget creation based on your income, expenses, and financial goals.",
-    example: "Create a budget for a college student with $800/month income"
-  },
-  {
-    icon: PiggyBank,
-    title: "Savings Planner",
-    description: "Get personalized savings strategies and track your progress toward financial goals.",
-    example: "Help me save $2,000 for spring break in 6 months"
-  },
-  {
-    icon: TrendingUp,
-    title: "Expense Analyzer",
-    description: "Analyze spending patterns and get insights to optimize your financial habits.",
-    example: "Why am I overspending on food this month?"
-  },
-  {
-    icon: MessageCircle,
-    title: "24/7 Financial Guidance",
-    description: "Ask any personal finance question and get expert advice instantly.",
-    example: "Should I get a credit card as a college student?"
-  }
-];
+const iconMap = {
+  Calculator, PiggyBank, TrendingUp, MessageCircle
+};
 
 const AIAssistant = () => {
+  const features = siteContent.aiAssistant.features.map((feature, index) => ({
+    ...feature,
+    icon: Object.values(iconMap)[index]
+  }));
+
   return (
     <section id="ai-assistant" className="py-20 bg-gradient-to-br from-cactus-50 to-cerulean-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,11 +25,10 @@ const AIAssistant = () => {
             </div>
           </div>
           <h2 className="text-4xl font-bold text-cactus-800 mb-4">
-            AI Financial Assistant
+            {siteContent.aiAssistant.title}
           </h2>
           <p className="text-xl text-cactus-600 max-w-3xl mx-auto">
-            Meet your personal finance companion powered by artificial intelligence. 
-            Get instant help with budgeting, saving, and financial planning tailored to your unique situation.
+            {siteContent.aiAssistant.description}
           </p>
         </div>
 
