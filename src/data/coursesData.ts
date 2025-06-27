@@ -9,9 +9,16 @@ export interface Course {
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   progress: number;
   topics: string[];
-  content?: string; // Add actual course content here
-  videoUrl?: string; // Add video URLs here
-  assignments?: string[]; // Add assignments here
+  content?: string;
+  videoUrl?: string;
+  assignments?: string[];
+  detailedLessons?: {
+    title: string;
+    description: string;
+    videoUrl?: string;
+    duration: string;
+    keyPoints: string[];
+  }[];
 }
 
 export const coursesData: Course[] = [
@@ -23,9 +30,29 @@ export const coursesData: Course[] = [
     students: 2500,
     level: "Beginner",
     progress: 0,
-    topics: ["Income tracking", "Expense categories", "Budget apps", "Emergency funds"],
-    content: "This course will teach you the fundamentals of budgeting...",
-    assignments: ["Create your first budget", "Track expenses for one week"]
+    topics: [
+      "Understanding Income and Expenses", 
+      "Creating Your First Budget", 
+      "Using Budget Apps and Tools", 
+      "Building Emergency Funds",
+      "Tracking Your Progress"
+    ],
+    content: "This comprehensive course will teach you the fundamentals of budgeting, from understanding your income and expenses to creating a sustainable budget that works for your lifestyle.",
+    assignments: ["Create your first budget", "Track expenses for one week", "Set up emergency fund goal"],
+    detailedLessons: [
+      {
+        title: "Understanding Income and Expenses",
+        description: "Learn to identify and categorize all your income sources and expenses",
+        duration: "25 minutes",
+        keyPoints: ["Fixed vs Variable Income", "Essential vs Non-essential Expenses", "Hidden Costs to Watch For"]
+      },
+      {
+        title: "Creating Your First Budget",
+        description: "Step-by-step guide to creating a budget that actually works",
+        duration: "30 minutes",
+        keyPoints: ["50/30/20 Rule", "Zero-Based Budgeting", "Envelope Method"]
+      }
+    ]
   },
   {
     id: 2,
@@ -35,9 +62,15 @@ export const coursesData: Course[] = [
     students: 1800,
     level: "Beginner",
     progress: 0,
-    topics: ["Savings goals", "High-yield accounts", "Automated savings", "Money-saving tips"],
-    content: "Learn effective saving strategies...",
-    assignments: ["Set up a savings goal", "Research high-yield savings accounts"]
+    topics: [
+      "Setting Realistic Savings Goals",
+      "High-Yield Savings Accounts", 
+      "Automated Savings Systems", 
+      "Money-Saving Tips for Students",
+      "Building Multiple Savings Funds"
+    ],
+    content: "Master the art of saving with strategies designed specifically for students and young adults.",
+    assignments: ["Set up a savings goal", "Research high-yield savings accounts", "Implement one money-saving tip daily"]
   },
   {
     id: 3,
@@ -47,9 +80,15 @@ export const coursesData: Course[] = [
     students: 1200,
     level: "Intermediate",
     progress: 0,
-    topics: ["Credit scores", "Credit cards", "Student loans", "Debt payoff strategies"],
-    content: "Master credit and debt management...",
-    assignments: ["Check your credit score", "Create a debt payoff plan"]
+    topics: [
+      "Understanding Credit Scores",
+      "Building Credit History", 
+      "Managing Credit Cards Wisely", 
+      "Student Loan Strategies",
+      "Debt Payoff Methods"
+    ],
+    content: "Learn how to build and maintain excellent credit while managing debt responsibly.",
+    assignments: ["Check your credit score", "Create a debt payoff plan", "Research student loan options"]
   },
   {
     id: 4,
@@ -59,9 +98,15 @@ export const coursesData: Course[] = [
     students: 950,
     level: "Intermediate",
     progress: 0,
-    topics: ["Stock market basics", "Index funds", "Risk management", "Retirement planning"],
-    content: "Introduction to investing...",
-    assignments: ["Research index funds", "Create an investment plan"]
+    topics: [
+      "Stock Market Basics",
+      "Understanding Index Funds", 
+      "Risk Management Principles", 
+      "Retirement Planning for Young Adults",
+      "Building a Diversified Portfolio"
+    ],
+    content: "Begin your investment journey with fundamental concepts and practical strategies.",
+    assignments: ["Research index funds", "Create an investment plan", "Set up retirement account"]
   },
   {
     id: 5,
@@ -71,9 +116,15 @@ export const coursesData: Course[] = [
     students: 3200,
     level: "Beginner",
     progress: 0,
-    topics: ["Student loans", "College budgeting", "Part-time income", "Career planning"],
-    content: "Financial planning specifically for students...",
-    assignments: ["Create a college budget", "Research student loan options"]
+    topics: [
+      "College Budget Management",
+      "Student Loan Navigation", 
+      "Part-time Income Optimization", 
+      "Post-Graduation Financial Planning",
+      "Building Credit as a Student"
+    ],
+    content: "Comprehensive financial planning specifically designed for students at all stages of their academic journey.",
+    assignments: ["Create a college budget", "Research student loan options", "Plan post-graduation finances"]
   },
   {
     id: 6,
@@ -83,8 +134,14 @@ export const coursesData: Course[] = [
     students: 800,
     level: "Advanced",
     progress: 0,
-    topics: ["Business planning", "Tax basics", "Marketing", "Financial tracking"],
-    content: "Entrepreneurship for students...",
-    assignments: ["Develop a business plan", "Research side hustle opportunities"]
+    topics: [
+      "Business Planning Fundamentals",
+      "Tax Basics for Entrepreneurs", 
+      "Marketing on a Budget", 
+      "Financial Tracking for Businesses",
+      "Scaling Your Side Hustle"
+    ],
+    content: "Turn your skills and interests into profitable side businesses while managing your studies.",
+    assignments: ["Develop a business plan", "Research side hustle opportunities", "Set up business tracking system"]
   }
 ];

@@ -4,8 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { coursesData } from '@/data/coursesData';
+import { useNavigate } from 'react-router-dom';
 
 const Courses = () => {
+  const navigate = useNavigate();
+
+  const handleStartCourse = (courseId: number) => {
+    navigate(`/course/${courseId}`);
+  };
+
   return (
     <section id="courses" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,7 +80,10 @@ const Courses = () => {
                   </ul>
                 </div>
 
-                <Button className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white">
+                <Button 
+                  onClick={() => handleStartCourse(course.id)}
+                  className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
+                >
                   Start Course
                 </Button>
               </CardContent>
