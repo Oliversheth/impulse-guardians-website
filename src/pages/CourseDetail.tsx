@@ -1,42 +1,41 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Users, Award, BookOpen, Lock, CheckCircle, Play } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, Users, Award, Play, Lock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { coursesData } from '@/data/coursesData';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
-import { coursesData, Course } from '@/data/coursesData';
+import AuthDialog from '@/components/AuthDialog';
 
 const CourseDetail = () => {
-  const { courseId } = useParams();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [activeSection, setActiveSection] = useState('courses');
-
-  useEffect(() => {
-    const foundCourse = coursesData.find(c => c.id === parseInt(courseId || '0'));
-    if (foundCourse) {
-      setCourse(foundCourse);
-    }
-  }, [courseId]);
+  const { courseId } = useParams<{ courseId: string }>();
+  const { isAuthenticated } = useAuth();
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  
+  const course = coursesData.find(c => c.id === courseId);
 
   if (!course) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gray-50">
         <Header 
-          activeSection={activeSection} 
-          setActiveSection={setActiveSection}
-          onAuthRequired={() => {}}
+          activeSection="courses" 
+          setActiveSection={() => {}}
+          onAuthRequired={() => setIsAuthDialogOpen(true)}
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-cactus-800">Course not found</h1>
-            <Link to="/" className="text-cerulean-600 hover:underline mt-4 inline-block">
-              ← Back to courses
-            </Link>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold text-cactus-800 mb-4">Course Not Found</h1>
+          <Link to="/">
+            <Button variant="outline">Return Home</Button>
+          </Link>
         </div>
+        <AuthDialog 
+          isOpen={isAuthDialogOpen} 
+          onClose={() => setIsAuthDialogOpen(false)} 
+        />
       </div>
     );
   }
@@ -45,187 +44,180 @@ const CourseDetail = () => {
   const totalLessons = course.lessons.length;
   const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
 
+  const handleLessonClick = (lessonId: string, isLocked: boolean) => {
+    if (!isAuthenticated) {
+      setIsAuthDialogOpen(true);
+      return;
+    }
+    
+    if (isLocked) {
+      return; // Don't navigate to locked lessons
+    }
+    
+    // Navigate to lesson
+    window.location.href = `/course/${courseId}/lesson/${lessonId}`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
-        activeSection={activeSection} 
-        setActiveSection={setActiveSection}
-        onAuthRequired={() => {}}
+        activeSection="courses" 
+        setActiveSection={() => {}}
+        onAuthRequired={() => setIsAuthDialogOpen(true)}
       />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Back Button */}
-        <Link 
-          to="/" 
-          className="inline-flex items-center text-cerulean-600 hover:text-cerulean-700 mb-6"
-        >
+        <Link to="/" className="inline-flex items-center text-cerulean-600 hover:text-cerulean-700 mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Courses
         </Link>
 
-        {/* Course Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-cactus-200 p-8 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-4">
-                <Badge 
-                  variant={course.level === 'Beginner' ? 'secondary' : course.level === 'Intermediate' ? 'default' : 'destructive'}
-                  className={
-                    course.level === 'Beginner' 
-                      ? 'bg-cerulean-100 text-cerulean-700' 
-                      : course.level === 'Intermediate'
-                      ? 'bg-cactus-100 text-cactus-700'
-                      : 'bg-cerulean-600 text-white'
-                  }
-                >
-                  {course.level}
-                </Badge>
-                <BookOpen className="h-6 w-6 text-cerulean-600" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Course Info */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <Badge 
+                    variant={course.level === 'Beginner' ? 'secondary' : course.level === 'Intermediate' ? 'default' : 'destructive'}
+                    className={
+                      course.level === 'Beginner' 
+                        ? 'bg-cerulean-100 text-cerulean-700 mb-4' 
+                        : course.level === 'Intermediate'
+                        ? 'bg-cactus-100 text-cactus-700 mb-4'
+                        : 'bg-cerulean-600 text-white mb-4'
+                    }
+                  >
+                    {course.level}
+                  </Badge>
+                  <h1 className="text-3xl font-bold text-cactus-800 mb-4">{course.title}</h1>
+                  <p className="text-lg text-cactus-600 mb-6">{course.description}</p>
+                </div>
+                <BookOpen className="h-12 w-12 text-cerulean-600" />
               </div>
-              
-              <h1 className="text-4xl font-bold text-cactus-800 mb-4">{course.title}</h1>
-              <p className="text-xl text-cactus-600 mb-6">{course.description}</p>
-              
-              <div className="flex items-center gap-6 text-sm text-cactus-500 mb-6">
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-2" />
-                  {course.duration}
+
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <Clock className="h-5 w-5 text-cerulean-600 mr-2" />
+                    <span className="font-semibold text-cactus-800">{course.duration}</span>
+                  </div>
+                  <p className="text-sm text-cactus-600">Duration</p>
                 </div>
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2" />
-                  {course.students.toLocaleString()} students
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <Users className="h-5 w-5 text-cerulean-600 mr-2" />
+                    <span className="font-semibold text-cactus-800">{course.students.toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm text-cactus-600">Students</p>
                 </div>
-                <div className="flex items-center">
-                  <Award className="h-4 w-4 mr-2" />
-                  {totalLessons} lessons
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <BookOpen className="h-5 w-5 text-cerulean-600 mr-2" />
+                    <span className="font-semibold text-cactus-800">{totalLessons}</span>
+                  </div>
+                  <p className="text-sm text-cactus-600">Lessons</p>
                 </div>
               </div>
 
               {/* Progress Section */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-cactus-700">Your Progress</h3>
-                  <span className="text-sm text-cactus-600">
-                    {completedLessons} of {totalLessons} lessons completed
-                  </span>
+              {isAuthenticated && progressPercentage > 0 && (
+                <div className="mb-8 p-4 bg-cerulean-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-cactus-700">Your Progress</h3>
+                    <span className="text-cerulean-600 font-semibold">{Math.round(progressPercentage)}%</span>
+                  </div>
+                  <Progress value={progressPercentage} className="h-3 mb-2" />
+                  <p className="text-sm text-cactus-600">{completedLessons} of {totalLessons} lessons completed</p>
                 </div>
-                <Progress value={progressPercentage} className="h-3" />
-                <p className="text-sm text-cactus-500 mt-1">
-                  {Math.round(progressPercentage)}% complete
-                </p>
-              </div>
-            </div>
+              )}
 
-            {/* Course Stats Card */}
-            <div className="lg:w-80">
-              <Card className="border-cactus-200">
-                <CardHeader>
-                  <CardTitle className="text-lg text-cactus-800">Course Overview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-cactus-700 mb-2">Learning Objectives</h4>
-                      <ul className="text-sm text-cactus-600 space-y-1">
-                        {course.objectives.map((objective, index) => (
-                          <li key={index} className="flex items-start">
-                            <Award className="h-3 w-3 mr-2 mt-1 text-cerulean-600 flex-shrink-0" />
-                            {objective}
-                          </li>
-                        ))}
-                      </ul>
+              {/* Learning Objectives */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-cactus-800 mb-4">What You'll Learn</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {course.topics.map((topic, index) => (
+                    <div key={index} className="flex items-center">
+                      <Award className="h-4 w-4 mr-3 text-cerulean-600 flex-shrink-0" />
+                      <span className="text-cactus-600">{topic}</span>
                     </div>
-                    
-                    <div>
-                      <h4 className="font-semibold text-cactus-700 mb-2">Topics Covered</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {course.topics.map((topic, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {topic}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-
-        {/* Lessons List */}
-        <div className="bg-white rounded-lg shadow-sm border border-cactus-200">
-          <div className="p-6 border-b border-cactus-200">
-            <h2 className="text-2xl font-bold text-cactus-800">Course Lessons</h2>
-            <p className="text-cactus-600 mt-1">Complete lessons in order to unlock the next one</p>
-          </div>
-          
-          <div className="divide-y divide-cactus-200">
-            {course.lessons.map((lesson, index) => (
-              <div key={lesson.id} className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4 flex-1">
-                    <div className="flex-shrink-0">
-                      {lesson.completed ? (
-                        <CheckCircle className="h-8 w-8 text-green-500" />
-                      ) : lesson.locked ? (
-                        <Lock className="h-8 w-8 text-gray-400" />
-                      ) : (
-                        <Play className="h-8 w-8 text-cerulean-600" />
-                      )}
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className={`text-lg font-semibold ${
-                          lesson.completed ? 'text-green-700' : 
-                          lesson.locked ? 'text-gray-400' : 'text-cactus-800'
-                        }`}>
-                          Lesson {index + 1}: {lesson.title}
-                        </h3>
-                        {lesson.completed && (
-                          <Badge variant="secondary" className="bg-green-100 text-green-700">
-                            Completed
-                          </Badge>
-                        )}
-                      </div>
-                      <p className={`text-sm ${
-                        lesson.locked ? 'text-gray-400' : 'text-cactus-600'
-                      }`}>
-                        {lesson.description}
-                      </p>
-                      <div className="flex items-center mt-2 text-xs text-cactus-500">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {lesson.duration}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-shrink-0 ml-4">
-                    {lesson.locked ? (
-                      <Button disabled variant="outline" className="opacity-50">
-                        Locked
-                      </Button>
-                    ) : lesson.completed ? (
-                      <Link to={`/course/${courseId}/lesson/${lesson.id}`}>
-                        <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                          Review
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Link to={`/course/${courseId}/lesson/${lesson.id}`}>
-                        <Button className="bg-cerulean-600 hover:bg-cerulean-700 text-white">
-                          Start Lesson
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            </div>
+          </div>
+
+          {/* Lessons Sidebar */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-cactus-800">Course Lessons</CardTitle>
+                <CardDescription>
+                  Complete lessons in order to unlock the next one
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {course.lessons.map((lesson, index) => {
+                    const isLocked = index > 0 && !course.lessons[index - 1].completed;
+                    const canAccess = isAuthenticated && !isLocked;
+                    
+                    return (
+                      <div
+                        key={lesson.id}
+                        className={`p-3 rounded-lg border transition-colors cursor-pointer ${
+                          lesson.completed
+                            ? 'bg-green-50 border-green-200'
+                            : canAccess
+                            ? 'bg-white border-gray-200 hover:border-cerulean-300'
+                            : 'bg-gray-50 border-gray-200 opacity-60'
+                        }`}
+                        onClick={() => handleLessonClick(lesson.id, isLocked)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            {lesson.completed ? (
+                              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <Award className="h-3 w-3 text-white" />
+                              </div>
+                            ) : isLocked ? (
+                              <Lock className="h-5 w-5 text-gray-400" />
+                            ) : (
+                              <Play className="h-5 w-5 text-cerulean-600" />
+                            )}
+                            <div>
+                              <h4 className="font-medium text-cactus-800 text-sm">{lesson.title}</h4>
+                              <p className="text-xs text-cactus-600">{lesson.duration}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {!isAuthenticated && (
+                  <div className="mt-6 p-4 bg-cerulean-50 rounded-lg text-center">
+                    <p className="text-sm text-cactus-600 mb-3">Sign in to track your progress and unlock lessons</p>
+                    <Button 
+                      onClick={() => setIsAuthDialogOpen(true)}
+                      className="bg-cerulean-600 hover:bg-cerulean-700 text-white"
+                    >
+                      Sign In to Start
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
+
+      <AuthDialog 
+        isOpen={isAuthDialogOpen} 
+        onClose={() => setIsAuthDialogOpen(false)} 
+      />
     </div>
   );
 };

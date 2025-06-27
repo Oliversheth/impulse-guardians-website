@@ -7,7 +7,6 @@ import AIAssistant from '@/components/AIAssistant';
 import About from '@/components/About';
 import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
-import { AuthProvider } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -29,21 +28,19 @@ const Index = () => {
   };
 
   return (
-    <AuthProvider>
-      <div className="min-h-screen">
-        <Header 
-          activeSection={activeSection} 
-          setActiveSection={setActiveSection}
-          onAuthRequired={() => setIsAuthDialogOpen(true)}
-        />
-        {renderActiveSection()}
-        <Footer />
-        <AuthDialog 
-          isOpen={isAuthDialogOpen} 
-          onClose={() => setIsAuthDialogOpen(false)} 
-        />
-      </div>
-    </AuthProvider>
+    <div className="min-h-screen">
+      <Header 
+        activeSection={activeSection} 
+        setActiveSection={setActiveSection}
+        onAuthRequired={() => setIsAuthDialogOpen(true)}
+      />
+      {renderActiveSection()}
+      <Footer />
+      <AuthDialog 
+        isOpen={isAuthDialogOpen} 
+        onClose={() => setIsAuthDialogOpen(false)} 
+      />
+    </div>
   );
 };
 
