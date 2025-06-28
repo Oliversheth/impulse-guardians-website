@@ -16,7 +16,7 @@ const CourseDetail = () => {
   const { isAuthenticated } = useAuth();
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   
-  const course = coursesData.find(c => c.id === courseId);
+  const course = coursesData.find(c => c.id.toString() === courseId);
 
   if (!course) {
     return (
@@ -44,7 +44,7 @@ const CourseDetail = () => {
   const totalLessons = course.lessons.length;
   const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
 
-  const handleLessonClick = (lessonId: string, isLocked: boolean) => {
+  const handleLessonClick = (lessonId: number, isLocked: boolean) => {
     if (!isAuthenticated) {
       setIsAuthDialogOpen(true);
       return;
