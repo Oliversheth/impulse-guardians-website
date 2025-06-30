@@ -38,6 +38,12 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     }
   };
 
+  // Get user display name from metadata or email
+  const getUserDisplayName = () => {
+    if (!user) return '';
+    return user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+  };
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,7 +79,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
             
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-cactus-600">Welcome, {user?.name}</span>
+                <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
                 <Button 
                   variant="outline"
                   onClick={logout}
@@ -123,7 +129,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
               
               {isAuthenticated ? (
                 <div className="flex flex-col space-y-2">
-                  <span className="text-sm text-cactus-600">Welcome, {user?.name}</span>
+                  <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
                   <Button 
                     variant="outline"
                     onClick={logout}
