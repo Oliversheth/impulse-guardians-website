@@ -1,18 +1,15 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,33 +28,56 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const login = async (email: string, password: string) => {
-    // Simulate login - replace this with your actual authentication logic
-    console.log('Login attempt:', { email, password });
-    
-    // Mock successful login
-    setUser({
-      id: '1',
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      name: email.split('@')[0]
+      password,
     });
+    
+    if (error) {
+      throw error;
+    }
   };
 
   const register = async (name: string, email: string, password: string) => {
-    // Simulate registration - replace this with your actual registration logic
-    console.log('Registration attempt:', { name, email, password });
-    
-    // Mock successful registration
-    setUser({
-      id: '1',
+    const { error } = await supabase.auth.signUp({
       email,
-      name
+      password,
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
     });
+    
+    if (error) {
+      throw error;
+    }
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw error;
+    }
   };
 
   return (
@@ -67,7 +87,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         isAuthenticated: !!user,
         login,
         register,
-        logout
+        logout,
+        loading
       }}
     >
       {children}

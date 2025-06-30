@@ -9,7 +9,144 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      ai_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          response: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          response: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          response?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      course_progress: {
+        Row: {
+          completed_at: string | null
+          course_id: number
+          enrolled_at: string
+          id: string
+          progress_percentage: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: number
+          enrolled_at?: string
+          id?: string
+          progress_percentage?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: number
+          enrolled_at?: string
+          id?: string
+          progress_percentage?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lesson_progress: {
+        Row: {
+          completed_at: string | null
+          course_id: number
+          id: string
+          lesson_id: number
+          quiz_passed: boolean | null
+          user_id: string
+          video_watched: boolean | null
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: number
+          id?: string
+          lesson_id: number
+          quiz_passed?: boolean | null
+          user_id: string
+          video_watched?: boolean | null
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: number
+          id?: string
+          lesson_id?: number
+          quiz_passed?: boolean | null
+          user_id?: string
+          video_watched?: boolean | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          attempted_at: string
+          course_id: number
+          id: string
+          lesson_id: number
+          passed: boolean
+          score: number
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          course_id: number
+          id?: string
+          lesson_id: number
+          passed: boolean
+          score: number
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          course_id?: number
+          id?: string
+          lesson_id?: number
+          passed?: boolean
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
