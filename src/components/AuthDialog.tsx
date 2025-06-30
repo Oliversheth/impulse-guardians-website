@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2 } from 'lucide-react';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -19,22 +21,38 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login, register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
     try {
+      let result;
       if (isLogin) {
-        await login(formData.email, formData.password);
+        result = await login(formData.email, formData.password);
       } else {
-        await register(formData.name, formData.email, formData.password);
+        if (!formData.name.trim()) {
+          setError('Please enter your full name');
+          setIsLoading(false);
+          return;
+        }
+        result = await register(formData.name, formData.email, formData.password);
       }
-      onClose();
-      setFormData({ name: '', email: '', password: '' });
+      
+      if (!result.error) {
+        if (isLogin) {
+          onClose();
+        }
+        setFormData({ name: '', email: '', password: '' });
+      } else {
+        setError(result.error);
+      }
     } catch (error) {
       console.error('Authentication error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -45,6 +63,14 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
       ...prev,
       [e.target.name]: e.target.value
     }));
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
+
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setError('');
+    setFormData({ name: '', email: '', password: '' });
   };
 
   return (
@@ -56,6 +82,12 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
           </DialogTitle>
         </DialogHeader>
         
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div className="space-y-2">
@@ -66,8 +98,9 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
                 type="text"
                 value={formData.name}
                 onChange={handleInputChange}
-                required
+                required={!isLogin}
                 placeholder="Enter your full name"
+                disabled={isLoading}
               />
             </div>
           )}
@@ -82,6 +115,7 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
               onChange={handleInputChange}
               required
               placeholder="Enter your email"
+              disabled={isLoading}
             />
           </div>
           
@@ -95,6 +129,8 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
               onChange={handleInputChange}
               required
               placeholder="Enter your password"
+              disabled={isLoading}
+              minLength={6}
             />
           </div>
           
@@ -103,15 +139,23 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
             className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
             disabled={isLoading}
           >
-            {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please wait...
+              </>
+            ) : (
+              isLogin ? 'Sign In' : 'Create Account'
+            )}
           </Button>
         </form>
         
         <div className="text-center pt-4">
           <button
             type="button"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={toggleMode}
             className="text-cerulean-600 hover:text-cerulean-700 underline"
+            disabled={isLoading}
           >
             {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
           </button>
