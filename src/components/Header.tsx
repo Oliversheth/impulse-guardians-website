@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   activeSection: string;
@@ -15,6 +15,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -29,15 +30,24 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       return;
     }
     setActiveSection(sectionId);
+    navigate('/');
     setIsMenuOpen(false);
   };
 
   const handleGetStartedClick = () => {
     if (isAuthenticated) {
       setActiveSection('courses');
+      navigate('/');
     } else {
       onAuthRequired();
     }
+  };
+
+  const handleAccountSettings = () => {
+    setActiveSection('account');
+    navigate('/');
+    setShowAccountMenu(false);
+    setIsMenuOpen(false);
   };
 
   const getUserDisplayName = () => {
@@ -50,9 +60,8 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand - Now clickable */}
-          <Link 
-            to="/" 
-            onClick={() => setActiveSection('home')}
+          <button 
+            onClick={() => handleNavClick('home')}
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
           >
             <img 
@@ -64,7 +73,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
               <h1 className="text-2xl font-bold text-cerulean-600">NoImpulse</h1>
               <p className="text-xs text-cactus-600">Financial Education for Students</p>
             </div>
-          </Link>
+          </button>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -94,10 +103,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                 {showAccountMenu && (
                   <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-48 z-50">
                     <button
-                      onClick={() => {
-                        setActiveSection('account');
-                        setShowAccountMenu(false);
-                      }}
+                      onClick={handleAccountSettings}
                       className="block w-full text-left px-4 py-2 text-sm text-cactus-700 hover:bg-cactus-50"
                     >
                       Account Settings
@@ -157,10 +163,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                 <div className="flex flex-col space-y-2">
                   <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
                   <button
-                    onClick={() => {
-                      setActiveSection('account');
-                      setIsMenuOpen(false);
-                    }}
+                    onClick={handleAccountSettings}
                     className="text-left text-cactus-700 hover:text-cerulean-600 w-fit"
                   >
                     Account Settings

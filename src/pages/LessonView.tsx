@@ -9,17 +9,30 @@ import Header from '@/components/Header';
 import QuizComponent from '@/components/QuizComponent';
 import { coursesData, Course, Lesson } from '@/data/coursesData';
 import { useToast } from '@/hooks/use-toast';
+import { useLessonProgress } from '@/hooks/useLessonProgress';
+import { useCourseProgress } from '@/hooks/useCourseProgress';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LessonView = () => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentStep, setCurrentStep] = useState<'video' | 'quiz' | 'completed'>('video');
-  const [videoWatched, setVideoWatched] = useState(false);
-  const [quizPassed, setQuizPassed] = useState(false);
   const [activeSection, setActiveSection] = useState('courses');
+
+  const { 
+    progress: lessonProgress, 
+    markVideoWatched, 
+    markQuizPassed,
+    videoWatched,
+    quizPassed,
+    isCompleted 
+  } = useLessonProgress(parseInt(courseId || '0'), parseInt(lessonId || '0'));
+
+  const { updateProgress } = useCourseProgress(parseInt(courseId || '0'));
 
   useEffect(() => {
     const foundCourse = coursesData.find(c => c.id === parseInt(courseId || '0'));
@@ -28,17 +41,23 @@ const LessonView = () => {
       const foundLesson = foundCourse.lessons.find(l => l.id === parseInt(lessonId || '0'));
       if (foundLesson) {
         setLesson(foundLesson);
-        if (foundLesson.completed) {
+        
+        // Set current step based on progress
+        if (isCompleted) {
           setCurrentStep('completed');
-          setVideoWatched(true);
-          setQuizPassed(true);
+        } else if (videoWatched && !quizPassed) {
+          setCurrentStep('quiz');
+        } else {
+          setCurrentStep('video');
         }
       }
     }
-  }, [courseId, lessonId]);
+  }, [courseId, lessonId, isCompleted, videoWatched, quizPassed]);
 
-  const handleVideoComplete = () => {
-    setVideoWatched(true);
+  const handleVideoComplete = async () => {
+    if (isAuthenticated) {
+      await markVideoWatched();
+    }
     setCurrentStep('quiz');
     toast({
       title: "Video completed!",
@@ -46,27 +65,22 @@ const LessonView = () => {
     });
   };
 
-  const handleQuizComplete = (passed: boolean, score: number) => {
+  const handleQuizComplete = async (passed: boolean, score: number) => {
     if (passed) {
-      setQuizPassed(true);
-      setCurrentStep('completed');
-      
-      // Mark lesson as completed and unlock next lesson
-      if (course && lesson) {
-        const updatedCourse = { ...course };
-        const lessonIndex = updatedCourse.lessons.findIndex(l => l.id === lesson.id);
-        if (lessonIndex !== -1) {
-          updatedCourse.lessons[lessonIndex].completed = true;
-          
-          // Unlock next lesson
-          if (lessonIndex + 1 < updatedCourse.lessons.length) {
-            updatedCourse.lessons[lessonIndex + 1].locked = false;
-          }
-          
-          setCourse(updatedCourse);
+      if (isAuthenticated) {
+        await markQuizPassed(score);
+        
+        // Update course progress
+        if (course) {
+          const completedLessons = course.lessons.filter(l => 
+            l.id === lesson?.id || lessonProgress?.completed_at
+          ).length;
+          const progressPercentage = (completedLessons / course.lessons.length) * 100;
+          await updateProgress(progressPercentage);
         }
       }
       
+      setCurrentStep('completed');
       toast({
         title: "Congratulations!",
         description: `You passed the quiz with ${score}%! Lesson completed.`,
@@ -86,12 +100,17 @@ const LessonView = () => {
     return currentIndex < course.lessons.length - 1 ? course.lessons[currentIndex + 1] : null;
   };
 
+  const handleNavigateToSection = (section: string) => {
+    setActiveSection(section);
+    navigate('/');
+  };
+
   if (!course || !lesson) {
     return (
       <div className="min-h-screen">
         <Header 
           activeSection={activeSection} 
-          setActiveSection={setActiveSection}
+          setActiveSection={handleNavigateToSection}
           onAuthRequired={() => {}}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -112,7 +131,7 @@ const LessonView = () => {
     <div className="min-h-screen bg-gray-50">
       <Header 
         activeSection={activeSection} 
-        setActiveSection={setActiveSection}
+        setActiveSection={handleNavigateToSection}
         onAuthRequired={() => {}}
       />
       
@@ -136,7 +155,7 @@ const LessonView = () => {
         <div className="bg-white rounded-lg shadow-sm border border-cactus-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-cactus-800">{lesson.title}</h1>
-            {lesson.completed && (
+            {isCompleted && (
               <CheckCircle className="h-8 w-8 text-green-500" />
             )}
           </div>
@@ -238,7 +257,7 @@ const LessonView = () => {
                 Congratulations! You've successfully completed this lesson.
               </p>
               <div className="flex space-x-4">
-                {nextLesson && !nextLesson.locked ? (
+                {nextLesson ? (
                   <Button 
                     onClick={() => navigate(`/course/${courseId}/lesson/${nextLesson.id}`)}
                     className="bg-cerulean-600 hover:bg-cerulean-700 text-white"
