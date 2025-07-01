@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Upload, Image, Paperclip } from 'lucide-react';
+import { Send, Upload, Paperclip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -69,7 +69,7 @@ const ChatInterface = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="flex items-center justify-center h-full">
         <Card className="p-8 text-center">
           <CardContent>
             <p className="text-lg text-cactus-600 mb-4">
@@ -82,7 +82,7 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-lg border border-cactus-200">
+    <div className="flex flex-col h-full bg-white">
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (

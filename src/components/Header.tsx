@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
   activeSection: string;
@@ -16,6 +16,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -24,28 +25,52 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     { id: 'about', label: 'About' },
   ];
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleNavClick = (sectionId: string, requiresAuth?: boolean) => {
     if (requiresAuth && !isAuthenticated) {
       onAuthRequired();
       return;
     }
-    setActiveSection(sectionId);
-    navigate('/');
+
+    // If we're not on the home page, navigate there first
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Use setTimeout to ensure the page has loaded before scrolling
+      setTimeout(() => {
+        setActiveSection(sectionId);
+        scrollToSection(sectionId);
+      }, 100);
+    } else {
+      setActiveSection(sectionId);
+      scrollToSection(sectionId);
+    }
+    
     setIsMenuOpen(false);
   };
 
   const handleGetStartedClick = () => {
     if (isAuthenticated) {
-      setActiveSection('courses');
-      navigate('/');
+      handleNavClick('courses');
     } else {
       onAuthRequired();
     }
   };
 
   const handleAccountSettings = () => {
-    setActiveSection('account');
-    navigate('/');
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        setActiveSection('account');
+      }, 100);
+    } else {
+      setActiveSection('account');
+    }
     setShowAccountMenu(false);
     setIsMenuOpen(false);
   };
