@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Clock, Users, Award, Play, Lock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,38 +10,27 @@ import { coursesData } from '@/data/coursesData';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import AuthDialog from '@/components/AuthDialog';
-import { useCourseProgress } from '@/hooks/useCourseProgress';
 
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { isAuthenticated } = useAuth();
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('courses');
-  const navigate = useNavigate();
   
   const course = coursesData.find(c => c.id.toString() === courseId);
-  const { progress, enrollInCourse, isEnrolled } = useCourseProgress(parseInt(courseId || '0'));
-
-  const handleNavigateToSection = (section: string) => {
-    setActiveSection(section);
-    if (section === 'home') {
-      navigate('/');
-    } else {
-      navigate(`/#${section}`);
-    }
-  };
 
   if (!course) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header 
-          activeSection={activeSection} 
-          setActiveSection={handleNavigateToSection}
+          activeSection="courses" 
+          setActiveSection={() => {}}
           onAuthRequired={() => setIsAuthDialogOpen(true)}
         />
         <div className="max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold text-cactus-800 mb-4">Course Not Found</h1>
-          <Button onClick={() => navigate('/')} variant="outline">Return Home</Button>
+          <Link to="/">
+            <Button variant="outline">Return Home</Button>
+          </Link>
         </div>
         <AuthDialog 
           isOpen={isAuthDialogOpen} 
@@ -53,47 +42,36 @@ const CourseDetail = () => {
 
   const completedLessons = course.lessons.filter(lesson => lesson.completed).length;
   const totalLessons = course.lessons.length;
-  const progressPercentage = progress?.progress_percentage || 0;
+  const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
 
-  const handleLessonClick = async (lessonId: number, isLocked: boolean) => {
+  const handleLessonClick = (lessonId: number, isLocked: boolean) => {
     if (!isAuthenticated) {
       setIsAuthDialogOpen(true);
       return;
     }
-
-    if (!isEnrolled) {
-      await enrollInCourse();
-    }
     
     if (isLocked) {
-      return;
+      return; // Don't navigate to locked lessons
     }
     
-    navigate(`/course/${courseId}/lesson/${lessonId}`);
-  };
-
-  const handleBackToCourses = () => {
-    setActiveSection('courses');
-    navigate('/#courses');
+    // Navigate to lesson
+    window.location.href = `/course/${courseId}/lesson/${lessonId}`;
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
-        activeSection={activeSection} 
-        setActiveSection={handleNavigateToSection}
+        activeSection="courses" 
+        setActiveSection={() => {}}
         onAuthRequired={() => setIsAuthDialogOpen(true)}
       />
       
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Back Button */}
-        <button 
-          onClick={handleBackToCourses}
-          className="inline-flex items-center text-cerulean-600 hover:text-cerulean-700 mb-6"
-        >
+        <Link to="/" className="inline-flex items-center text-cerulean-600 hover:text-cerulean-700 mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Courses
-        </button>
+        </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Course Info */}
@@ -143,6 +121,7 @@ const CourseDetail = () => {
                 </div>
               </div>
 
+              {/* Progress Section */}
               {isAuthenticated && progressPercentage > 0 && (
                 <div className="mb-8 p-4 bg-cerulean-50 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
@@ -154,6 +133,7 @@ const CourseDetail = () => {
                 </div>
               )}
 
+              {/* Learning Objectives */}
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-cactus-800 mb-4">What You'll Learn</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

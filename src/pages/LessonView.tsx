@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, CheckCircle, Clock, Award } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -9,61 +9,36 @@ import Header from '@/components/Header';
 import QuizComponent from '@/components/QuizComponent';
 import { coursesData, Course, Lesson } from '@/data/coursesData';
 import { useToast } from '@/hooks/use-toast';
-import { useLessonProgress } from '@/hooks/useLessonProgress';
-import { useCourseProgress } from '@/hooks/useCourseProgress';
-import { useAuth } from '@/contexts/AuthContext';
 
 const LessonView = () => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentStep, setCurrentStep] = useState<'video' | 'quiz' | 'completed'>('video');
-  const [activeSection, setActiveSection] = useState('courses');
   const [videoWatched, setVideoWatched] = useState(false);
-
-  const courseIdNum = parseInt(courseId || '0');
-  const lessonIdNum = parseInt(lessonId || '0');
-
-  const { 
-    progress: lessonProgress, 
-    markVideoWatched, 
-    markQuizPassed,
-    videoWatched: dbVideoWatched,
-    quizPassed: dbQuizPassed,
-    isCompleted 
-  } = useLessonProgress(courseIdNum, lessonIdNum);
-
-  const { updateProgress } = useCourseProgress(courseIdNum);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const [activeSection, setActiveSection] = useState('courses');
 
   useEffect(() => {
-    const foundCourse = coursesData.find(c => c.id === courseIdNum);
+    const foundCourse = coursesData.find(c => c.id === parseInt(courseId || '0'));
     if (foundCourse) {
       setCourse(foundCourse);
-      const foundLesson = foundCourse.lessons.find(l => l.id === lessonIdNum);
+      const foundLesson = foundCourse.lessons.find(l => l.id === parseInt(lessonId || '0'));
       if (foundLesson) {
         setLesson(foundLesson);
-        setVideoWatched(dbVideoWatched);
-        
-        // Set current step based on progress
-        if (isCompleted) {
+        if (foundLesson.completed) {
           setCurrentStep('completed');
-        } else if (dbVideoWatched && !dbQuizPassed) {
-          setCurrentStep('quiz');
-        } else {
-          setCurrentStep('video');
+          setVideoWatched(true);
+          setQuizPassed(true);
         }
       }
     }
-  }, [courseIdNum, lessonIdNum, isCompleted, dbVideoWatched, dbQuizPassed]);
+  }, [courseId, lessonId]);
 
-  const handleVideoComplete = async () => {
+  const handleVideoComplete = () => {
     setVideoWatched(true);
-    if (isAuthenticated) {
-      await markVideoWatched();
-    }
     setCurrentStep('quiz');
     toast({
       title: "Video completed!",
@@ -71,22 +46,27 @@ const LessonView = () => {
     });
   };
 
-  const handleQuizComplete = async (passed: boolean, score: number) => {
+  const handleQuizComplete = (passed: boolean, score: number) => {
     if (passed) {
-      if (isAuthenticated) {
-        await markQuizPassed(score);
-        
-        // Update course progress
-        if (course) {
-          const completedLessons = course.lessons.filter((l, index) => 
-            l.id === lesson?.id || index < course.lessons.findIndex(cl => cl.id === lesson?.id)
-          ).length;
-          const progressPercentage = Math.min(100, (completedLessons / course.lessons.length) * 100);
-          await updateProgress(progressPercentage);
+      setQuizPassed(true);
+      setCurrentStep('completed');
+      
+      // Mark lesson as completed and unlock next lesson
+      if (course && lesson) {
+        const updatedCourse = { ...course };
+        const lessonIndex = updatedCourse.lessons.findIndex(l => l.id === lesson.id);
+        if (lessonIndex !== -1) {
+          updatedCourse.lessons[lessonIndex].completed = true;
+          
+          // Unlock next lesson
+          if (lessonIndex + 1 < updatedCourse.lessons.length) {
+            updatedCourse.lessons[lessonIndex + 1].locked = false;
+          }
+          
+          setCourse(updatedCourse);
         }
       }
       
-      setCurrentStep('completed');
       toast({
         title: "Congratulations!",
         description: `You passed the quiz with ${score}%! Lesson completed.`,
@@ -106,21 +86,12 @@ const LessonView = () => {
     return currentIndex < course.lessons.length - 1 ? course.lessons[currentIndex + 1] : null;
   };
 
-  const handleNavigateToSection = (section: string) => {
-    setActiveSection(section);
-    if (section === 'home') {
-      navigate('/');
-    } else {
-      navigate(`/#${section}`);
-    }
-  };
-
   if (!course || !lesson) {
     return (
       <div className="min-h-screen">
         <Header 
           activeSection={activeSection} 
-          setActiveSection={handleNavigateToSection}
+          setActiveSection={setActiveSection}
           onAuthRequired={() => {}}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -141,7 +112,7 @@ const LessonView = () => {
     <div className="min-h-screen bg-gray-50">
       <Header 
         activeSection={activeSection} 
-        setActiveSection={handleNavigateToSection}
+        setActiveSection={setActiveSection}
         onAuthRequired={() => {}}
       />
       
@@ -165,7 +136,7 @@ const LessonView = () => {
         <div className="bg-white rounded-lg shadow-sm border border-cactus-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-cactus-800">{lesson.title}</h1>
-            {isCompleted && (
+            {lesson.completed && (
               <CheckCircle className="h-8 w-8 text-green-500" />
             )}
           </div>
@@ -197,18 +168,18 @@ const LessonView = () => {
             
             <div className={`flex items-center space-x-2 ${
               currentStep === 'quiz' ? 'text-cerulean-600' : 
-              dbQuizPassed ? 'text-green-600' : 'text-gray-400'
+              quizPassed ? 'text-green-600' : 'text-gray-400'
             }`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 currentStep === 'quiz' ? 'bg-cerulean-100' : 
-                dbQuizPassed ? 'bg-green-100' : 'bg-gray-100'
+                quizPassed ? 'bg-green-100' : 'bg-gray-100'
               }`}>
-                {dbQuizPassed ? <CheckCircle className="h-5 w-5" /> : <span className="text-sm font-bold">?</span>}
+                {quizPassed ? <CheckCircle className="h-5 w-5" /> : <span className="text-sm font-bold">?</span>}
               </div>
               <span className="font-medium">Take Quiz</span>
             </div>
             
-            <div className={`h-px flex-1 ${dbQuizPassed ? 'bg-green-300' : 'bg-gray-300'}`} />
+            <div className={`h-px flex-1 ${quizPassed ? 'bg-green-300' : 'bg-gray-300'}`} />
             
             <div className={`flex items-center space-x-2 ${
               currentStep === 'completed' ? 'text-green-600' : 'text-gray-400'
@@ -227,49 +198,27 @@ const LessonView = () => {
         {currentStep === 'video' && (
           <Card className="border-cactus-200 mb-6">
             <CardHeader>
-              <CardTitle className="text-cactus-800 flex items-center">
-                <Play className="h-6 w-6 mr-2" />
-                Lesson Video
-              </CardTitle>
+              <CardTitle className="text-cactus-800">Lesson Video</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-gradient-to-br from-cerulean-600 to-cactus-600 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
-                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-                <div className="text-center text-white z-10">
-                  <div className="bg-white bg-opacity-20 rounded-full p-4 mb-4 mx-auto w-20 h-20 flex items-center justify-center">
-                    <Play className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{lesson.title}</h3>
-                  <p className="text-sm opacity-90 mb-2">Duration: {lesson.duration}</p>
-                  <p className="text-xs opacity-75 max-w-md mx-auto">
-                    This is a placeholder video. In a real implementation, this would be an embedded video player with the actual lesson content.
-                  </p>
+              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center mb-4">
+                <div className="text-center text-white">
+                  <Play className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg font-medium">Video Player Placeholder</p>
+                  <p className="text-sm opacity-75">Click "Mark as Watched" to continue</p>
                 </div>
               </div>
-              <div className="text-center">
-                <Button 
-                  onClick={handleVideoComplete}
-                  className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-3"
-                  disabled={videoWatched}
-                >
-                  {videoWatched ? (
-                    <>
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      Video Completed
-                    </>
-                  ) : (
-                    <>
-                      <Award className="h-5 w-5 mr-2" />
-                      Mark Video as Watched
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button 
+                onClick={handleVideoComplete}
+                className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
+              >
+                Mark Video as Watched
+              </Button>
             </CardContent>
           </Card>
         )}
 
-        {currentStep === 'quiz' && lesson.quiz && (
+        {currentStep === 'quiz' && (
           <QuizComponent 
             quiz={lesson.quiz}
             onComplete={handleQuizComplete}
@@ -289,7 +238,7 @@ const LessonView = () => {
                 Congratulations! You've successfully completed this lesson.
               </p>
               <div className="flex space-x-4">
-                {nextLesson ? (
+                {nextLesson && !nextLesson.locked ? (
                   <Button 
                     onClick={() => navigate(`/course/${courseId}/lesson/${nextLesson.id}`)}
                     className="bg-cerulean-600 hover:bg-cerulean-700 text-white"
@@ -301,13 +250,12 @@ const LessonView = () => {
                     onClick={() => navigate(`/course/${courseId}`)}
                     className="bg-cactus-600 hover:bg-cactus-700 text-white"
                   >
-                    Course Complete! Return to Course
+                    Back to Course
                   </Button>
                 )}
                 <Button 
                   variant="outline"
                   onClick={() => navigate(`/course/${courseId}`)}
-                  className="border-cactus-600 text-cactus-600 hover:bg-cactus-50"
                 >
                   Course Overview
                 </Button>

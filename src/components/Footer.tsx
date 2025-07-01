@@ -1,19 +1,9 @@
 
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 
-interface FooterProps {
-  setActiveSection: (section: string) => void;
-}
-
-const Footer = ({ setActiveSection }: FooterProps) => {
-  const handleLinkClick = (section: string) => {
-    setActiveSection(section);
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+const Footer = () => {
   return (
-    <footer className="text-white py-12" style={{ backgroundColor: '#7C7C7C' }}>
+    <footer className="bg-cactus-800 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -26,44 +16,24 @@ const Footer = ({ setActiveSection }: FooterProps) => {
               />
               <div>
                 <h3 className="text-2xl font-bold">NoImpulse</h3>
-                <p className="text-gray-300">Financial Education for Students</p>
+                <p className="text-cactus-300">Financial Education for Students</p>
               </div>
             </div>
-            <p className="text-gray-300 mb-6 max-w-md">
+            <p className="text-cactus-300 mb-6 max-w-md">
               Empowering students with essential personal finance skills through interactive 
               courses and AI-powered tools for a secure financial future.
             </p>
             <div className="flex space-x-4">
-              <a 
-                href="https://facebook.com/noimpulse" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-cerulean-400 transition-colors"
-              >
+              <a href="#" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a 
-                href="https://twitter.com/noimpulse" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-cerulean-400 transition-colors"
-              >
+              <a href="#" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a 
-                href="https://instagram.com/noimpulse" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-cerulean-400 transition-colors"
-              >
+              <a href="#" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a 
-                href="https://linkedin.com/company/noimpulse" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-cerulean-400 transition-colors"
-              >
+              <a href="#" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
@@ -74,44 +44,29 @@ const Footer = ({ setActiveSection }: FooterProps) => {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <button 
-                  onClick={() => handleLinkClick('home')}
-                  className="text-gray-300 hover:text-cerulean-400 transition-colors text-left"
-                >
+                <a href="#home" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                   Home
-                </button>
+                </a>
               </li>
               <li>
-                <button 
-                  onClick={() => handleLinkClick('courses')}
-                  className="text-gray-300 hover:text-cerulean-400 transition-colors text-left"
-                >
+                <a href="#courses" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                   Courses
-                </button>
+                </a>
               </li>
               <li>
-                <button 
-                  onClick={() => handleLinkClick('ai-assistant')}
-                  className="text-gray-300 hover:text-cerulean-400 transition-colors text-left"
-                >
-                  Budget Bot
-                </button>
+                <a href="#ai-assistant" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
+                  AI Assistant
+                </a>
               </li>
               <li>
-                <button 
-                  onClick={() => handleLinkClick('about')}
-                  className="text-gray-300 hover:text-cerulean-400 transition-colors text-left"
-                >
+                <a href="#about" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
                   About Us
-                </button>
+                </a>
               </li>
               <li>
-                <button 
-                  onClick={() => handleLinkClick('legal')}
-                  className="text-gray-300 hover:text-cerulean-400 transition-colors text-left"
-                >
-                  Legal Disclaimer
-                </button>
+                <a href="#" className="text-cactus-300 hover:text-cerulean-400 transition-colors">
+                  Contact
+                </a>
               </li>
             </ul>
           </div>
@@ -122,15 +77,15 @@ const Footer = ({ setActiveSection }: FooterProps) => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-cerulean-400" />
-                <span className="text-gray-300">info@noimpulse.org</span>
+                <span className="text-cactus-300">info@noimpulse.org</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-cerulean-400" />
-                <span className="text-gray-300">(555) 123-4567</span>
+                <span className="text-cactus-300">(555) 123-4567</span>
               </li>
               <li className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 text-cerulean-400 mt-1" />
-                <span className="text-gray-300">
+                <span className="text-cactus-300">
                   123 Education St.<br />
                   Learning City, LC 12345
                 </span>
@@ -139,21 +94,11 @@ const Footer = ({ setActiveSection }: FooterProps) => {
           </div>
         </div>
 
-        <div className="border-t border-gray-600 mt-8 pt-8 text-center">
-          <p className="text-gray-300">
+        <div className="border-t border-cactus-700 mt-8 pt-8 text-center">
+          <p className="text-cactus-300">
             © 2024 NoImpulse. All rights reserved. | 
-            <button 
-              onClick={() => handleLinkClick('legal')}
-              className="hover:text-cerulean-400 transition-colors ml-1"
-            >
-              Privacy Policy
-            </button> | 
-            <button 
-              onClick={() => handleLinkClick('legal')}
-              className="hover:text-cerulean-400 transition-colors ml-1"
-            >
-              Terms of Service
-            </button>
+            <a href="#" className="hover:text-cerulean-400 transition-colors ml-1">Privacy Policy</a> | 
+            <a href="#" className="hover:text-cerulean-400 transition-colors ml-1">Terms of Service</a>
           </p>
         </div>
       </div>

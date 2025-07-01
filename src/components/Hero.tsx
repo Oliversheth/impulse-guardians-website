@@ -1,80 +1,148 @@
 
-import { ArrowRight, BookOpen, Users, TrendingUp } from 'lucide-react';
+import { ArrowRight, BookOpen, Bot, Target, Users, Award, Shield, TrendingUp, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { siteContent } from '@/data/siteContent';
 
 interface HeroProps {
-  setActiveSection: (section: string) => void;
-  visitorCount: number;
+  setActiveSection?: (section: string) => void;
 }
 
-const Hero = ({ setActiveSection, visitorCount }: HeroProps) => {
-  const formattedVisitorCount = Math.round(visitorCount / 100) * 100;
+const Hero = ({ setActiveSection }: HeroProps) => {
+  const iconMap = {
+    BookOpen, Bot, Calculator, Target, Users, Award, Shield, TrendingUp
+  };
 
   return (
-    <section id="home" className="relative bg-gradient-to-br from-cerulean-50 to-cactus-50 py-20 overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-cerulean-600 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cactus-600 rounded-full blur-3xl"></div>
-      </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-cactus-800 mb-6 animate-fade-in">
-            {siteContent.hero.title}
+    <section className="bg-gradient-to-br from-cerulean-50 to-cactus-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        {/* Hero Content */}
+        <div className="text-center animate-fade-in mb-12">
+          <h1 className="text-4xl md:text-6xl font-bold text-cactus-800 mb-4">
+            {siteContent.hero.title.split(' ').slice(0, 2).join(' ')}
+            <span className="text-cerulean-600"> {siteContent.hero.title.split(' ').slice(2).join(' ')}</span>
           </h1>
-          <p className="text-xl md:text-2xl text-cactus-600 mb-8 max-w-3xl mx-auto animate-fade-in">
-            {siteContent.hero.subtitle}
-          </p>
-          <p className="text-lg text-cactus-500 mb-10 max-w-4xl mx-auto animate-fade-in">
+          <p className="text-lg md:text-xl text-cactus-600 mb-6 max-w-3xl mx-auto">
             {siteContent.hero.description}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <Button 
               size="lg" 
               className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
-              onClick={() => setActiveSection('courses')}
+              onClick={() => setActiveSection?.('courses')}
             >
-              Start Learning <ArrowRight className="ml-2 h-5 w-5" />
+              Start Learning
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
-              size="lg" 
               variant="outline" 
+              size="lg" 
               className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg"
-              onClick={() => setActiveSection('ai-assistant')}
+              onClick={() => setActiveSection?.('ai-assistant')}
             >
-              Try Budget Bot
+              Try AI Assistant
+              <Bot className="ml-2 h-5 w-5" />
             </Button>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-cerulean-600 mb-2">{siteContent.hero.stats.studentsEducated}</div>
+              <div className="text-cactus-600">Students Educated</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-cerulean-600 mb-2">{siteContent.hero.stats.interactiveCourses}</div>
+              <div className="text-cactus-600">Interactive Courses</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-cerulean-600 mb-2">{siteContent.hero.stats.successRate}</div>
+              <div className="text-cactus-600">Success Rate</div>
+            </div>
           </div>
         </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <div className="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in">
-            <div className="flex justify-center mb-4">
-              <Users className="h-8 w-8 text-cerulean-600" />
-            </div>
-            <h3 className="text-3xl font-bold text-cactus-800 mb-2">{formattedVisitorCount.toLocaleString()}+</h3>
-            <p className="text-cactus-600">Students Helped</p>
-          </div>
+        {/* Features Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-cactus-800 mb-4">
+            {siteContent.features.title}
+          </h2>
+          <p className="text-center text-cactus-600 mb-8 max-w-2xl mx-auto">
+            {siteContent.features.subtitle}
+          </p>
           
-          <div className="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in">
-            <div className="flex justify-center mb-4">
-              <BookOpen className="h-8 w-8 text-cerulean-600" />
-            </div>
-            <h3 className="text-3xl font-bold text-cactus-800 mb-2">{siteContent.hero.stats.interactiveCourses}</h3>
-            <p className="text-cactus-600">Interactive Courses</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {siteContent.features.items.map((feature, index) => {
+              const IconComponent = iconMap[feature.icon as keyof typeof iconMap];
+              return (
+                <div key={index} className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="bg-cerulean-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <IconComponent className="h-6 w-6 text-cerulean-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-cactus-800 mb-2">{feature.title}</h3>
+                  <p className="text-cactus-600">{feature.description}</p>
+                </div>
+              );
+            })}
           </div>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-cactus-800 mb-8">
+            How It Works
+          </h2>
           
-          <div className="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in">
-            <div className="flex justify-center mb-4">
-              <TrendingUp className="h-8 w-8 text-cerulean-600" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="bg-cerulean-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                1
+              </div>
+              <h3 className="text-xl font-semibold text-cactus-800 mb-2">Sign Up & Assess</h3>
+              <p className="text-cactus-600">
+                Create your account and take our quick assessment to understand your current financial knowledge level.
+              </p>
             </div>
-            <h3 className="text-3xl font-bold text-cactus-800 mb-2">{siteContent.hero.stats.successRate}</h3>
-            <p className="text-cactus-600">Success Rate</p>
+
+            <div className="text-center">
+              <div className="bg-cerulean-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                2
+              </div>
+              <h3 className="text-xl font-semibold text-cactus-800 mb-2">Learn & Practice</h3>
+              <p className="text-cactus-600">
+                Complete interactive courses at your own pace and practice with real-world scenarios and simulations.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="bg-cerulean-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                3
+              </div>
+              <h3 className="text-xl font-semibold text-cactus-800 mb-2">Apply & Succeed</h3>
+              <p className="text-cactus-600">
+                Use your new skills to create budgets, set goals, and build a secure financial future.
+              </p>
+            </div>
           </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="bg-white rounded-lg p-8 text-center shadow-lg">
+          <h2 className="text-2xl md:text-3xl font-bold text-cactus-800 mb-4">
+            Ready to Take Control of Your Finances?
+          </h2>
+          <p className="text-cactus-600 mb-6 max-w-2xl mx-auto">
+            Join thousands of students who have already transformed their financial future with NoImpulse. 
+            Start your journey today – it's completely free!
+          </p>
+          <Button 
+            size="lg" 
+            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
+            onClick={() => setActiveSection?.('courses')}
+          >
+            Get Started Free
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </div>
       </div>
     </section>

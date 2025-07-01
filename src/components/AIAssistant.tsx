@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Bot, MessageCircle, Calculator, TrendingUp, PiggyBank } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { siteContent } from '@/data/siteContent';
 import { useAuth } from '@/contexts/AuthContext';
 import ChatInterface from './ChatInterface';
-import SampleBudgets from './SampleBudgets';
 
 const iconMap = {
   Calculator, PiggyBank, TrendingUp, MessageCircle
@@ -15,7 +13,6 @@ const iconMap = {
 
 const AIAssistant = () => {
   const [showChatInterface, setShowChatInterface] = useState(false);
-  const [showSampleBudgets, setShowSampleBudgets] = useState(false);
   const { isAuthenticated } = useAuth();
   
   const features = siteContent.aiAssistant.features.map((feature, index) => ({
@@ -25,14 +22,10 @@ const AIAssistant = () => {
 
   const handleStartChat = () => {
     if (!isAuthenticated) {
-      alert('Please log in to use Budget Bot');
+      alert('Please log in to use the AI assistant');
       return;
     }
     setShowChatInterface(true);
-  };
-
-  const handleViewSampleBudgets = () => {
-    setShowSampleBudgets(true);
   };
 
   return (
@@ -46,10 +39,10 @@ const AIAssistant = () => {
               </div>
             </div>
             <h2 className="text-4xl font-bold text-cactus-800 mb-4">
-              Budget Bot - Your AI Financial Assistant
+              {siteContent.aiAssistant.title}
             </h2>
             <p className="text-xl text-cactus-600 max-w-3xl mx-auto">
-              Meet your personal finance companion powered by artificial intelligence. Get instant help with budgeting, saving, and financial planning tailored to your unique situation.
+              {siteContent.aiAssistant.description}
             </p>
           </div>
 
@@ -85,7 +78,7 @@ const AIAssistant = () => {
                   <Bot className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-cactus-800">Budget Bot</h3>
+                  <h3 className="font-semibold text-cactus-800">NoImpulse AI Assistant</h3>
                   <p className="text-sm text-cactus-600">Ready to help with your finances</p>
                 </div>
               </div>
@@ -122,13 +115,9 @@ const AIAssistant = () => {
                   onClick={handleStartChat}
                   className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
                 >
-                  Start Chat with Budget Bot
+                  Start Chat with AI Assistant
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
-                  onClick={handleViewSampleBudgets}
-                >
+                <Button variant="outline" className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50">
                   View Sample Budgets
                 </Button>
               </div>
@@ -138,32 +127,7 @@ const AIAssistant = () => {
       </section>
 
       {showChatInterface && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl h-[600px] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <div className="flex items-center space-x-2">
-                <Bot className="h-5 w-5 text-cerulean-600" />
-                <h2 className="text-lg font-semibold">Budget Bot</h2>
-              </div>
-              <Button variant="ghost" onClick={() => setShowChatInterface(false)} className="text-xl">
-                ×
-              </Button>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <ChatInterface />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showSampleBudgets && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <SampleBudgets onClose={() => setShowSampleBudgets(false)} />
-            </div>
-          </div>
-        </div>
+        <ChatInterface onClose={() => setShowChatInterface(false)} />
       )}
     </>
   );
