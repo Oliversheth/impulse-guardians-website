@@ -1,8 +1,16 @@
 
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   activeSection: string;
@@ -17,7 +25,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'courses', label: 'Courses', requiresAuth: true },
-    { id: 'ai-assistant', label: 'AI Assistant', requiresAuth: true },
+    { id: 'ai-assistant', label: 'Budget Bot', requiresAuth: true },
     { id: 'about', label: 'About' },
   ];
 
@@ -38,7 +46,6 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     }
   };
 
-  // Get user display name from metadata or email
   const getUserDisplayName = () => {
     if (!user) return '';
     return user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
@@ -49,7 +56,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveSection('home')}>
             <img 
               src="/lovable-uploads/fc12e82d-c153-4ef3-92d4-c698a1ca2f55.png" 
               alt="NoImpulse Logo" 
@@ -78,16 +85,27 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
             ))}
             
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
-                <Button 
-                  variant="outline"
-                  onClick={logout}
-                  className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
-                >
-                  Logout
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span>{getUserDisplayName()}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <Link to="/account">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Account Settings
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button 
                 onClick={handleGetStartedClick}
@@ -130,12 +148,17 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
               {isAuthenticated ? (
                 <div className="flex flex-col space-y-2">
                   <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
+                  <Link to="/account">
+                    <Button variant="outline" className="w-fit">
+                      Account Settings
+                    </Button>
+                  </Link>
                   <Button 
                     variant="outline"
                     onClick={logout}
-                    className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 w-fit"
+                    className="w-fit"
                   >
-                    Logout
+                    Sign Out
                   </Button>
                 </div>
               ) : (

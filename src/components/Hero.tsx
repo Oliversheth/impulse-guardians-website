@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { ArrowRight, BookOpen, Bot, Target, Users, Award, Shield, TrendingUp, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { siteContent } from '@/data/siteContent';
@@ -8,6 +9,22 @@ interface HeroProps {
 }
 
 const Hero = ({ setActiveSection }: HeroProps) => {
+  const [studentsHelped, setStudentsHelped] = useState(5000);
+  
+  useEffect(() => {
+    // Simulate live counter by adding visits
+    const interval = setInterval(() => {
+      setStudentsHelped(prev => {
+        const increment = Math.floor(Math.random() * 3) + 1; // Random 1-3
+        const newCount = prev + increment;
+        // Round to nearest hundred
+        return Math.round(newCount / 100) * 100;
+      });
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const iconMap = {
     BookOpen, Bot, Calculator, Target, Users, Award, Shield, TrendingUp
   };
@@ -40,7 +57,7 @@ const Hero = ({ setActiveSection }: HeroProps) => {
               className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg"
               onClick={() => setActiveSection?.('ai-assistant')}
             >
-              Try AI Assistant
+              Try Budget Bot
               <Bot className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -48,8 +65,8 @@ const Hero = ({ setActiveSection }: HeroProps) => {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-cerulean-600 mb-2">{siteContent.hero.stats.studentsEducated}</div>
-              <div className="text-cactus-600">Students Educated</div>
+              <div className="text-3xl font-bold text-cerulean-600 mb-2">{studentsHelped.toLocaleString()}+</div>
+              <div className="text-cactus-600">Students Helped</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-cerulean-600 mb-2">{siteContent.hero.stats.interactiveCourses}</div>

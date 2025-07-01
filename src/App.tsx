@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import CourseDetail from "./pages/CourseDetail";
 import LessonView from "./pages/LessonView";
+import AccountSettings from "./pages/AccountSettings";
+import LegalDisclaimer from "./pages/LegalDisclaimer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/course/:courseId" element={<CourseDetail />} />
             <Route path="/course/:courseId/lesson/:lessonId" element={<LessonView />} />
+            <Route path="/account" element={<AccountSettings />} />
+            <Route path="/legal-disclaimer" element={<LegalDisclaimer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
