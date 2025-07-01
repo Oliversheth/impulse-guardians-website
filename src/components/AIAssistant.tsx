@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Bot, MessageCircle, Calculator, TrendingUp, PiggyBank } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +23,7 @@ const AIAssistant = () => {
 
   const handleStartChat = () => {
     if (!isAuthenticated) {
-      alert('Please log in to use the AI assistant');
+      alert('Please log in to use Budget Bot');
       return;
     }
     setShowChatInterface(true);
@@ -39,10 +40,10 @@ const AIAssistant = () => {
               </div>
             </div>
             <h2 className="text-4xl font-bold text-cactus-800 mb-4">
-              {siteContent.aiAssistant.title}
+              Budget Bot - Your AI Financial Assistant
             </h2>
             <p className="text-xl text-cactus-600 max-w-3xl mx-auto">
-              {siteContent.aiAssistant.description}
+              Meet your personal finance companion powered by artificial intelligence. Get instant help with budgeting, saving, and financial planning tailored to your unique situation.
             </p>
           </div>
 
@@ -78,7 +79,7 @@ const AIAssistant = () => {
                   <Bot className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-cactus-800">NoImpulse AI Assistant</h3>
+                  <h3 className="font-semibold text-cactus-800">Budget Bot</h3>
                   <p className="text-sm text-cactus-600">Ready to help with your finances</p>
                 </div>
               </div>
@@ -115,7 +116,7 @@ const AIAssistant = () => {
                   onClick={handleStartChat}
                   className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
                 >
-                  Start Chat with AI Assistant
+                  Start Chat with Budget Bot
                 </Button>
                 <Button variant="outline" className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50">
                   View Sample Budgets

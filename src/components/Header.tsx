@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   activeSection: string;
@@ -12,12 +13,13 @@ interface HeaderProps {
 
 const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'courses', label: 'Courses', requiresAuth: true },
-    { id: 'ai-assistant', label: 'AI Assistant', requiresAuth: true },
+    { id: 'ai-assistant', label: 'Budget Bot', requiresAuth: true },
     { id: 'about', label: 'About' },
   ];
 
@@ -38,7 +40,6 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     }
   };
 
-  // Get user display name from metadata or email
   const getUserDisplayName = () => {
     if (!user) return '';
     return user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
@@ -48,8 +49,12 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Brand */}
-          <div className="flex items-center space-x-3">
+          {/* Logo and Brand - Now clickable */}
+          <Link 
+            to="/" 
+            onClick={() => setActiveSection('home')}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
             <img 
               src="/lovable-uploads/fc12e82d-c153-4ef3-92d4-c698a1ca2f55.png" 
               alt="NoImpulse Logo" 
@@ -59,7 +64,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
               <h1 className="text-2xl font-bold text-cerulean-600">NoImpulse</h1>
               <p className="text-xs text-cactus-600">Financial Education for Students</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -78,15 +83,36 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
             ))}
             
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
-                <Button 
-                  variant="outline"
-                  onClick={logout}
-                  className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
+              <div className="flex items-center space-x-4 relative">
+                <button
+                  onClick={() => setShowAccountMenu(!showAccountMenu)}
+                  className="text-sm text-cactus-600 hover:text-cerulean-600 transition-colors"
                 >
-                  Logout
-                </Button>
+                  Welcome, {getUserDisplayName()}
+                </button>
+                
+                {showAccountMenu && (
+                  <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-48 z-50">
+                    <button
+                      onClick={() => {
+                        setActiveSection('account');
+                        setShowAccountMenu(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-cactus-700 hover:bg-cactus-50"
+                    >
+                      Account Settings
+                    </button>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowAccountMenu(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-cactus-700 hover:bg-cactus-50"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <Button 
@@ -130,9 +156,21 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
               {isAuthenticated ? (
                 <div className="flex flex-col space-y-2">
                   <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
+                  <button
+                    onClick={() => {
+                      setActiveSection('account');
+                      setIsMenuOpen(false);
+                    }}
+                    className="text-left text-cactus-700 hover:text-cerulean-600 w-fit"
+                  >
+                    Account Settings
+                  </button>
                   <Button 
                     variant="outline"
-                    onClick={logout}
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
                     className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 w-fit"
                   >
                     Logout

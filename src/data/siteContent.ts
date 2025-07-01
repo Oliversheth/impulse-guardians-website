@@ -52,7 +52,7 @@ export const siteContent: SiteContent = {
         icon: "BookOpen"
       },
       {
-        title: "AI-Powered Assistant",
+        title: "Budget Bot - AI Assistant",
         description: "Get personalized financial advice and help creating budgets with our intelligent AI assistant.",
         icon: "Bot"
       },
@@ -79,7 +79,7 @@ export const siteContent: SiteContent = {
     ]
   },
   aiAssistant: {
-    title: "AI Financial Assistant",
+    title: "Budget Bot - AI Financial Assistant",
     description: "Meet your personal finance companion powered by artificial intelligence. Get instant help with budgeting, saving, and financial planning tailored to your unique situation.",
     features: [
       {
