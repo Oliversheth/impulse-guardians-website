@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, MessageCircle, Plus, History } from 'lucide-react';
+import { Send, MessageCircle, Plus, History, Paperclip, X, Image, File } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,8 +13,10 @@ interface ChatInterfaceProps {
 
 const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState('');
-  const [showConversationList, setShowConversationList] = useState(true);
+  const [showConversationList, setShowConversationList] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { messages, sendMessage, isLoading } = useAIChat();
   const { user } = useAuth();
 
@@ -28,16 +30,30 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || isLoading) return;
+    if ((!inputMessage.trim() && attachedFiles.length === 0) || isLoading) return;
 
-    const message = inputMessage.trim();
+    const messageText = inputMessage.trim() || '[File attachment]';
     setInputMessage('');
+    setAttachedFiles([]);
     
     try {
-      await sendMessage(message);
+      await sendMessage(messageText);
     } catch (error) {
       console.error('Failed to send message:', error);
     }
+  };
+
+  const handleFileAttachment = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachedFiles(prev => [...prev, ...files]);
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const startNewConversation = () => {
@@ -51,10 +67,10 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               <MessageCircle className="h-5 w-5" />
-              <span>AI Assistant Conversations</span>
+              <span>Budget Bot Conversations</span>
             </CardTitle>
             <Button variant="ghost" onClick={onClose}>
-              ×
+              <X className="h-4 w-4" />
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -82,13 +98,19 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-4xl max-h-[80vh] flex flex-col mx-4">
-        <CardHeader className="flex flex-row items-center justify-between border-b">
-          <CardTitle className="flex items-center space-x-2">
-            <MessageCircle className="h-5 w-5" />
-            <span>Financial Education AI Assistant</span>
-          </CardTitle>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="w-full max-w-4xl h-[85vh] bg-white rounded-lg shadow-xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-white rounded-t-lg">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-cerulean-600 rounded-full">
+              <MessageCircle className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-cactus-800">Budget Bot</h2>
+              <p className="text-sm text-cactus-600">Financial Education AI Assistant</p>
+            </div>
+          </div>
           <div className="flex items-center space-x-2">
             <Button 
               variant="ghost" 
@@ -97,65 +119,131 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
             >
               <History className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" onClick={onClose}>
-              ×
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
             </Button>
           </div>
-        </CardHeader>
+        </div>
         
-        <CardContent className="flex-1 flex flex-col p-0">
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-            {messages.map((message) => (
+        {/* Messages Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+            >
               <div
-                key={message.id}
-                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                className={`max-w-[70%] px-4 py-3 rounded-lg ${
+                  message.isUser
+                    ? 'bg-cerulean-600 text-white rounded-br-sm'
+                    : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm shadow-sm'
+                }`}
               >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.isUser
-                      ? 'bg-cerulean-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
+                <div className="whitespace-pre-wrap break-words">
+                  {message.content}
+                </div>
+                <p className={`text-xs mt-2 ${
+                  message.isUser ? 'text-cerulean-100' : 'text-gray-500'
+                }`}>
+                  {message.timestamp.toLocaleTimeString()}
+                </p>
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-white text-gray-800 border border-gray-200 px-4 py-3 rounded-lg rounded-bl-sm shadow-sm">
+                <div className="flex items-center space-x-2">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                  <span className="text-sm text-gray-500">Budget Bot is thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+        
+        {/* File Attachments Preview */}
+        {attachedFiles.length > 0 && (
+          <div className="px-4 py-2 border-t bg-gray-50">
+            <div className="flex flex-wrap gap-2">
+              {attachedFiles.map((file, index) => (
+                <div key={index} className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 border">
+                  {file.type.startsWith('image/') ? (
+                    <Image className="h-4 w-4 text-blue-500" />
+                  ) : (
+                    <File className="h-4 w-4 text-gray-500" />
+                  )}
+                  <span className="text-sm text-gray-700 truncate max-w-[100px]">
+                    {file.name}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => removeFile(index)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Input Area */}
+        <div className="p-4 border-t bg-white rounded-b-lg">
+          <form onSubmit={handleSendMessage} className="flex items-end space-x-2">
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleFileAttachment}
+                  disabled={isLoading}
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  <p className="text-sm">{message.content}</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                <Input
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder="Ask me about budgeting, investing, or financial planning..."
+                  disabled={isLoading}
+                  className="flex-1 min-h-[40px] resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(e);
+                    }
+                  }}
+                />
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
-                  <p className="text-sm">AI is typing...</p>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-          
-          {/* Input Area */}
-          <div className="border-t p-4">
-            <form onSubmit={handleSendMessage} className="flex space-x-2">
-              <Input
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask me about budgeting, investing, or financial planning..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button 
-                type="submit" 
-                disabled={isLoading || !inputMessage.trim()}
-                className="bg-cerulean-600 hover:bg-cerulean-700"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+            <Button 
+              type="submit" 
+              disabled={isLoading || (!inputMessage.trim() && attachedFiles.length === 0)}
+              size="sm"
+              className="bg-cerulean-600 hover:bg-cerulean-700 h-10"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,.pdf,.doc,.docx,.txt"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+        </div>
+      </div>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { siteContent } from '@/data/siteContent';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import ChatInterface from './ChatInterface';
 
 const iconMap = {
@@ -15,6 +16,7 @@ const iconMap = {
 const AIAssistant = () => {
   const [showChatInterface, setShowChatInterface] = useState(false);
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   const features = siteContent.aiAssistant.features.map((feature, index) => ({
     ...feature,
@@ -27,6 +29,10 @@ const AIAssistant = () => {
       return;
     }
     setShowChatInterface(true);
+  };
+
+  const handleViewSampleBudgets = () => {
+    navigate('/sample-budgets');
   };
 
   return (
@@ -118,7 +124,11 @@ const AIAssistant = () => {
                 >
                   Start Chat with Budget Bot
                 </Button>
-                <Button variant="outline" className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
+                  onClick={handleViewSampleBudgets}
+                >
                   View Sample Budgets
                 </Button>
               </div>
