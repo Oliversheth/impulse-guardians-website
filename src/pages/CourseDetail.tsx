@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Clock, Users, Award, Play, Lock } from 'lucide-react';
@@ -23,7 +24,11 @@ const CourseDetail = () => {
 
   const handleNavigateToSection = (section: string) => {
     setActiveSection(section);
-    navigate('/');
+    if (section === 'home') {
+      navigate('/');
+    } else {
+      navigate(`/#${section}`);
+    }
   };
 
   if (!course) {
@@ -69,7 +74,7 @@ const CourseDetail = () => {
 
   const handleBackToCourses = () => {
     setActiveSection('courses');
-    navigate('/');
+    navigate('/#courses');
   };
 
   return (

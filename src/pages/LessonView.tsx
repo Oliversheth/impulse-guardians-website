@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, CheckCircle, Clock, FileText } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, Clock, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -108,7 +108,11 @@ const LessonView = () => {
 
   const handleNavigateToSection = (section: string) => {
     setActiveSection(section);
-    navigate('/');
+    if (section === 'home') {
+      navigate('/');
+    } else {
+      navigate(`/#${section}`);
+    }
   };
 
   if (!course || !lesson) {
@@ -223,24 +227,44 @@ const LessonView = () => {
         {currentStep === 'video' && (
           <Card className="border-cactus-200 mb-6">
             <CardHeader>
-              <CardTitle className="text-cactus-800">Lesson Video</CardTitle>
+              <CardTitle className="text-cactus-800 flex items-center">
+                <Play className="h-6 w-6 mr-2" />
+                Lesson Video
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center mb-4">
-                <div className="text-center text-white">
-                  <Play className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">Video: {lesson.title}</p>
-                  <p className="text-sm opacity-75">Duration: {lesson.duration}</p>
-                  <p className="text-xs opacity-50 mt-2">Click "Mark as Watched" when finished</p>
+              <div className="aspect-video bg-gradient-to-br from-cerulean-600 to-cactus-600 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                <div className="text-center text-white z-10">
+                  <div className="bg-white bg-opacity-20 rounded-full p-4 mb-4 mx-auto w-20 h-20 flex items-center justify-center">
+                    <Play className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{lesson.title}</h3>
+                  <p className="text-sm opacity-90 mb-2">Duration: {lesson.duration}</p>
+                  <p className="text-xs opacity-75 max-w-md mx-auto">
+                    This is a placeholder video. In a real implementation, this would be an embedded video player with the actual lesson content.
+                  </p>
                 </div>
               </div>
-              <Button 
-                onClick={handleVideoComplete}
-                className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
-                disabled={videoWatched}
-              >
-                {videoWatched ? 'Video Completed ✓' : 'Mark Video as Watched'}
-              </Button>
+              <div className="text-center">
+                <Button 
+                  onClick={handleVideoComplete}
+                  className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-3"
+                  disabled={videoWatched}
+                >
+                  {videoWatched ? (
+                    <>
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      Video Completed
+                    </>
+                  ) : (
+                    <>
+                      <Award className="h-5 w-5 mr-2" />
+                      Mark Video as Watched
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -283,6 +307,7 @@ const LessonView = () => {
                 <Button 
                   variant="outline"
                   onClick={() => navigate(`/course/${courseId}`)}
+                  className="border-cactus-600 text-cactus-600 hover:bg-cactus-50"
                 >
                   Course Overview
                 </Button>

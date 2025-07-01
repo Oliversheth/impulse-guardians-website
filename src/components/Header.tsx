@@ -26,10 +26,13 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
   ];
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Wait a bit for navigation to complete if needed
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const handleNavClick = (sectionId: string, requiresAuth?: boolean) => {
@@ -38,16 +41,17 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       return;
     }
 
+    setActiveSection(sectionId);
+    
     // If we're not on the home page, navigate there first
     if (location.pathname !== '/') {
       navigate('/');
-      // Use setTimeout to ensure the page has loaded before scrolling
+      // Wait for navigation to complete, then scroll
       setTimeout(() => {
-        setActiveSection(sectionId);
         scrollToSection(sectionId);
-      }, 100);
+      }, 200);
     } else {
-      setActiveSection(sectionId);
+      // We're already on home page, just scroll
       scrollToSection(sectionId);
     }
     
@@ -63,13 +67,14 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
   };
 
   const handleAccountSettings = () => {
+    setActiveSection('account');
     if (location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {
-        setActiveSection('account');
-      }, 100);
+        scrollToSection('account');
+      }, 200);
     } else {
-      setActiveSection('account');
+      scrollToSection('account');
     }
     setShowAccountMenu(false);
     setIsMenuOpen(false);
