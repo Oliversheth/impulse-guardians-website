@@ -1,53 +1,84 @@
 
-import { useState, useRef, useEffect } from 'react';
-import { Send, Upload, Paperclip } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { useAIChat } from '@/hooks/useAIChat';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Send, Paperclip } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-const ChatInterface = () => {
+interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
+
+interface ChatInterfaceProps {
+  onClose: () => void;
+}
+
+const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      text: "Hi! I'm your Budget Bot. I can help you with budgeting, financial planning, saving strategies, and answer any questions about personal finance. What would you like to know?",
+      sender: 'bot',
+      timestamp: new Date(),
+    },
+  ]);
   const [inputMessage, setInputMessage] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { messages, sendMessage, isLoading } = useAIChat();
-  const { isAuthenticated } = useAuth();
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() && selectedFiles.length === 0) return;
-    
-    if (!isAuthenticated) {
-      toast.error('Please sign in to use Budget Bot');
-      return;
-    }
+    if (!inputMessage.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: inputMessage,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
 
     try {
-      let messageContent = inputMessage.trim();
-      
-      // Handle file uploads (placeholder for now)
-      if (selectedFiles.length > 0) {
-        const fileNames = selectedFiles.map(f => f.name).join(', ');
-        messageContent += `\n\n[Files attached: ${fileNames}]`;
-        toast.info('File upload feature coming soon!');
+      const { data, error } = await supabase.functions.invoke('openai-assistant', {
+        body: { 
+          message: inputMessage,
+          threadId: threadId 
+        }
+      });
+
+      if (error) throw error;
+
+      // Update thread ID if this is the first message
+      if (!threadId && data.threadId) {
+        setThreadId(data.threadId);
       }
 
-      await sendMessage(messageContent);
-      setInputMessage('');
-      setSelectedFiles([]);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: data.response,
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Failed to send message. Please try again.');
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'Sorry, I encountered an error. Please try again.',
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,137 +89,106 @@ const ChatInterface = () => {
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles(prev => [...prev, ...files]);
+  const handleFileUpload = () => {
+    fileInputRef.current?.click();
   };
 
-  const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Handle file upload logic here
+      console.log('File selected:', file.name);
+    }
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Card className="p-8 text-center">
-          <CardContent>
-            <p className="text-lg text-cactus-600 mb-4">
-              Please sign in to chat with Budget Bot
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] p-3 rounded-lg ${
-                message.isUser
-                  ? 'bg-cerulean-600 text-white'
-                  : 'bg-gray-100 text-cactus-800'
-              }`}
-            >
-              <p className="whitespace-pre-wrap">{message.content}</p>
-              <span className="text-xs opacity-70 mt-1 block">
-                {message.timestamp.toLocaleTimeString()}
-              </span>
-            </div>
-          </div>
-        ))}
-        
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-100 text-cactus-800 p-3 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <div className="animate-pulse">Budget Bot is thinking...</div>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-cactus-200 bg-cerulean-50">
+        <div>
+          <h3 className="font-semibold text-cactus-800">Budget Bot</h3>
+          <p className="text-sm text-cactus-600">Your personal finance assistant</p>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
+          className="text-cactus-600 hover:text-cactus-800"
+        >
+          ×
+        </Button>
       </div>
 
-      {/* File Preview */}
-      {selectedFiles.length > 0 && (
-        <div className="px-4 py-2 border-t border-gray-200">
-          <div className="flex flex-wrap gap-2">
-            {selectedFiles.map((file, index) => (
+      {/* Messages */}
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
               <div
-                key={index}
-                className="flex items-center bg-cactus-50 rounded-lg px-3 py-1 text-sm"
+                className={`max-w-[80%] rounded-lg p-3 ${
+                  message.sender === 'user'
+                    ? 'bg-cerulean-600 text-white'
+                    : 'bg-cactus-100 text-cactus-800'
+                }`}
               >
-                <Paperclip className="h-4 w-4 mr-2" />
-                <span className="truncate max-w-32">{file.name}</span>
-                <button
-                  onClick={() => removeFile(index)}
-                  className="ml-2 text-red-500 hover:text-red-700"
-                >
-                  ×
-                </button>
+                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-cerulean-100' : 'text-cactus-500'}`}>
+                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-cactus-100 text-cactus-800 rounded-lg p-3">
+                <div className="flex items-center space-x-2">
+                  <div className="animate-pulse">Thinking...</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </ScrollArea>
 
-      {/* Input Area */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-end space-x-2">
-          <div className="flex-1">
-            <Input
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask Budget Bot about personal finance..."
-              disabled={isLoading}
-              className="resize-none"
-            />
-          </div>
-          
-          {/* File Upload Button */}
+      {/* Input */}
+      <div className="p-4 border-t border-cactus-200">
+        <div className="flex items-center space-x-2">
           <Button
-            variant="outline"
-            size="icon"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
-            className="flex-shrink-0"
+            variant="ghost"
+            size="sm"
+            onClick={handleFileUpload}
+            className="text-cactus-600 hover:text-cactus-800"
           >
-            <Upload className="h-4 w-4" />
+            <Paperclip className="h-4 w-4" />
           </Button>
-          
-          {/* Send Button */}
+          <Input
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask me about budgeting, saving, or any financial question..."
+            className="flex-1"
+            disabled={isLoading}
+          />
           <Button
             onClick={handleSendMessage}
-            disabled={isLoading || (!inputMessage.trim() && selectedFiles.length === 0)}
-            className="bg-cerulean-600 hover:bg-cerulean-700 text-white flex-shrink-0"
+            disabled={!inputMessage.trim() || isLoading}
+            className="bg-cerulean-600 hover:bg-cerulean-700 text-white"
           >
             <Send className="h-4 w-4" />
           </Button>
         </div>
-        
-        {/* Hidden File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xlsx"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-        
-        <p className="text-xs text-cactus-500 mt-2">
-          You can upload images, documents, and spreadsheets to help Budget Bot better understand your financial situation.
-        </p>
       </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+        accept=".txt,.pdf,.doc,.docx"
+      />
     </div>
   );
 };
