@@ -128,7 +128,19 @@ const AIAssistant = () => {
       </section>
 
       {showChatInterface && (
-        <ChatInterface onClose={() => setShowChatInterface(false)} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full h-[80vh] m-4">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Budget Bot</h2>
+              <Button variant="ghost" onClick={() => setShowChatInterface(false)}>
+                ×
+              </Button>
+            </div>
+            <div className="h-full p-4">
+              <ChatInterface />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

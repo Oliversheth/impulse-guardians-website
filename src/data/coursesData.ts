@@ -16,10 +16,8 @@ export interface Lesson {
   id: number;
   title: string;
   description: string;
-  duration: string;
   videoUrl?: string;
-  completed: boolean;
-  locked: boolean;
+  duration: string;
   quiz: Quiz;
 }
 
@@ -27,261 +25,281 @@ export interface Course {
   id: number;
   title: string;
   description: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  duration: string;
-  students: number;
-  topics: string[];
   lessons: Lesson[];
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  category: string;
+  imageUrl: string;
+  duration: string;
 }
 
 export const coursesData: Course[] = [
   {
     id: 1,
-    title: "Budgeting Basics for Students",
-    description: "Learn the fundamentals of creating and maintaining a budget that works for your student lifestyle.",
-    level: "Beginner",
+    title: "Budgeting Basics",
+    description: "Learn the fundamentals of creating and managing a personal budget",
+    difficulty: "Beginner",
+    category: "Personal Finance",
+    imageUrl: "/placeholder.svg",
     duration: "2 hours",
-    students: 1250,
-    topics: [
-      "Understanding income and expenses",
-      "Creating a realistic budget",
-      "Tracking spending habits",
-      "Emergency fund basics",
-      "Student-specific budgeting tips"
-    ],
     lessons: [
       {
         id: 1,
         title: "Introduction to Budgeting",
-        description: "Understand the basics of personal finance and why budgeting is crucial for students.",
-        duration: "15 min",
-        completed: false,
-        locked: false,
+        description: "Understanding what a budget is and why it's important",
+        duration: "15 minutes",
         quiz: {
           passingScore: 70,
           questions: [
             {
               id: 1,
-              question: "What is the primary purpose of a budget?",
+              question: "What is a budget?",
               options: [
-                "To restrict your spending completely",
-                "To track and plan your income and expenses",
-                "To make you wealthy quickly",
-                "To impress your friends"
+                "A plan for how you will spend your money",
+                "A way to track your expenses only",
+                "A savings account",
+                "A type of investment"
               ],
-              correctAnswer: 1,
-              explanation: "A budget helps you track where your money comes from and where it goes, allowing you to make informed financial decisions."
+              correctAnswer: 0,
+              explanation: "A budget is a plan that helps you allocate your income to different expenses and savings goals."
             },
             {
               id: 2,
-              question: "What percentage of your income should ideally go to savings?",
-              options: ["5%", "10-20%", "50%", "1%"],
+              question: "What is the main purpose of budgeting?",
+              options: [
+                "To restrict all spending",
+                "To manage money effectively and reach financial goals",
+                "To impress others",
+                "To avoid paying taxes"
+              ],
               correctAnswer: 1,
-              explanation: "Financial experts generally recommend saving 10-20% of your income, though even small amounts are beneficial when starting out."
+              explanation: "Budgeting helps you manage your money effectively and work toward your financial goals."
             },
             {
               id: 3,
-              question: "Which expense category should be prioritized first in a budget?",
-              options: ["Entertainment", "Basic needs (food, shelter)", "Shopping", "Dining out"],
-              correctAnswer: 1,
-              explanation: "Basic needs like food, shelter, and transportation should always be prioritized in your budget before discretionary spending."
+              question: "How often should you review your budget?",
+              options: [
+                "Once a year",
+                "Never, once it's set",
+                "Monthly or when circumstances change",
+                "Only when you run out of money"
+              ],
+              correctAnswer: 2,
+              explanation: "Regular review helps you stay on track and adjust for changing circumstances."
             },
             {
               id: 4,
-              question: "How often should you review and update your budget?",
-              options: ["Once a year", "Never", "Monthly or when circumstances change", "Only when you're broke"],
+              question: "What should be included in a basic budget?",
+              options: [
+                "Only fixed expenses",
+                "Only variable expenses",
+                "Income, fixed expenses, variable expenses, and savings",
+                "Just savings goals"
+              ],
               correctAnswer: 2,
-              explanation: "Regular monthly reviews help you stay on track and adjust for changing circumstances."
+              explanation: "A comprehensive budget includes all income sources and all types of expenses plus savings."
             },
             {
               id: 5,
-              question: "What is the 50/30/20 rule in budgeting?",
+              question: "What is the 50/30/20 rule?",
               options: [
-                "50% savings, 30% needs, 20% wants",
                 "50% needs, 30% wants, 20% savings",
+                "50% savings, 30% needs, 20% wants",
                 "50% wants, 30% needs, 20% savings",
-                "It's not a real budgeting rule"
+                "It's not a real budgeting method"
               ],
-              correctAnswer: 1,
-              explanation: "The 50/30/20 rule suggests allocating 50% to needs, 30% to wants, and 20% to savings and debt repayment."
+              correctAnswer: 0,
+              explanation: "The 50/30/20 rule allocates 50% to needs, 30% to wants, and 20% to savings and debt repayment."
             },
             {
               id: 6,
-              question: "Which of these is considered a 'fixed expense'?",
-              options: ["Groceries", "Entertainment", "Rent", "Dining out"],
-              correctAnswer: 2,
-              explanation: "Fixed expenses like rent remain the same each month, while variable expenses can fluctuate."
+              question: "What are fixed expenses?",
+              options: [
+                "Expenses that change every month",
+                "Expenses that stay the same each month",
+                "Expenses you only pay once",
+                "Expenses for entertainment"
+              ],
+              correctAnswer: 1,
+              explanation: "Fixed expenses are costs that remain constant each month, like rent or insurance."
             },
             {
               id: 7,
-              question: "What should you do if your expenses exceed your income?",
+              question: "What are variable expenses?",
               options: [
-                "Ignore it and hope for the best",
-                "Cut unnecessary expenses or find additional income",
-                "Use credit cards for everything",
-                "Stop tracking your money"
+                "Expenses that stay the same each month",
+                "Expenses that change in amount each month",
+                "Expenses you never have to pay",
+                "Only entertainment costs"
               ],
               correctAnswer: 1,
-              explanation: "When expenses exceed income, you need to either reduce spending or increase income to avoid debt."
+              explanation: "Variable expenses fluctuate from month to month, like groceries or utility bills."
             },
             {
               id: 8,
-              question: "What is an emergency fund?",
+              question: "Why is an emergency fund important in budgeting?",
               options: [
-                "Money for vacation",
-                "Money set aside for unexpected expenses",
-                "Money for shopping",
-                "Money for investments only"
+                "It's not important",
+                "It provides financial security for unexpected expenses",
+                "It's only for wealthy people",
+                "It replaces the need for insurance"
               ],
               correctAnswer: 1,
-              explanation: "An emergency fund is money specifically saved for unexpected expenses like medical bills or car repairs."
+              explanation: "An emergency fund helps you handle unexpected expenses without derailing your budget."
             },
             {
               id: 9,
-              question: "Why is budgeting especially important for students?",
+              question: "What should you do if you overspend in one category?",
               options: [
-                "Students have unlimited money",
-                "Students typically have limited and irregular income",
-                "Budgeting is only for adults",
-                "Students don't need to worry about money"
+                "Ignore it and hope it doesn't happen again",
+                "Adjust other categories or find ways to reduce spending",
+                "Give up on budgeting entirely",
+                "Borrow money to cover it"
               ],
               correctAnswer: 1,
-              explanation: "Students often have limited, irregular income and need to make their money stretch to cover education and living expenses."
+              explanation: "When you overspend, adjust other categories or find ways to reduce future spending to stay balanced."
             },
             {
               id: 10,
-              question: "What's the best first step when creating a budget?",
+              question: "What's the first step in creating a budget?",
               options: [
-                "Set spending limits immediately",
-                "Track your current income and expenses",
-                "Cut all entertainment spending",
-                "Apply for more credit cards"
+                "Set spending limits",
+                "Calculate your total income",
+                "List all your wants",
+                "Open a savings account"
               ],
               correctAnswer: 1,
-              explanation: "Understanding your current financial situation by tracking income and expenses is the foundation of effective budgeting."
+              explanation: "You need to know how much money you have coming in before you can plan how to spend it."
             }
           ]
         }
       },
       {
         id: 2,
-        title: "Tracking Your Expenses",
-        description: "Learn different methods to track your spending and identify patterns.",
-        duration: "20 min",
-        completed: false,
-        locked: true,
+        title: "Creating Your First Budget",
+        description: "Step-by-step guide to building a personal budget",
+        duration: "20 minutes",
         quiz: {
           passingScore: 70,
           questions: [
             {
               id: 11,
-              question: "What is the most effective way to track expenses?",
+              question: "What's the first step in creating a budget?",
               options: [
-                "Keep all receipts in a shoebox",
-                "Use a budgeting app or spreadsheet consistently", 
-                "Try to remember everything",
-                "Only track large purchases"
+                "List all expenses",
+                "Calculate total monthly income",
+                "Set savings goals",
+                "Choose budgeting software"
               ],
               correctAnswer: 1,
-              explanation: "Consistent tracking using digital tools provides the most accurate and useful data for budgeting decisions."
+              explanation: "You must know your income before you can allocate it to different categories."
             },
             {
               id: 12,
-              question: "How long should you track expenses to see meaningful patterns?",
-              options: ["1 day", "1 week", "At least 1 month", "1 year"],
-              correctAnswer: 2,
-              explanation: "Tracking for at least a month gives you enough data to identify spending patterns and seasonal variations."
+              question: "Which expenses should you prioritize first?",
+              options: [
+                "Entertainment and hobbies",
+                "Basic needs like housing, food, and utilities",
+                "Luxury items",
+                "Non-essential shopping"
+              ],
+              correctAnswer: 1,
+              explanation: "Essential needs should always be prioritized in your budget."
             },
             {
               id: 13,
-              question: "What are 'invisible expenses'?",
+              question: "How much should you ideally save each month?",
               options: [
-                "Expenses you can't see",
-                "Small, frequent purchases that add up",
-                "Illegal expenses",
-                "Future expenses"
+                "Whatever is left over",
+                "At least 10-20% of your income",
+                "Only $50",
+                "You don't need to save while in college"
               ],
               correctAnswer: 1,
-              explanation: "Small daily purchases like coffee or snacks can add up significantly over time but are often overlooked."
+              explanation: "Financial experts recommend saving 10-20% of your income when possible."
             },
             {
               id: 14,
-              question: "Which expense tracking method works best for most people?",
+              question: "What should you do with leftover money at the end of the month?",
               options: [
-                "Cash only",
-                "Credit cards only",
-                "A combination of methods that fit your lifestyle",
-                "Mental tracking only"
+                "Spend it all immediately",
+                "Add it to savings or pay extra on debt",
+                "Only use it for entertainment",
+                "Keep it in checking forever"
               ],
-              correctAnswer: 2,
-              explanation: "The best method is one you'll actually use consistently, which varies by individual preferences and habits."
+              correctAnswer: 1,
+              explanation: "Leftover money should be put toward your financial goals like savings or debt reduction."
             },
             {
               id: 15,
-              question: "When should you categorize your expenses?",
+              question: "How should you handle irregular income?",
               options: [
-                "Never",
-                "Only at the end of the year",
-                "As you make purchases or record them",
-                "Only for large expenses"
+                "Don't budget at all",
+                "Base your budget on your lowest expected income",
+                "Only budget in months with high income",
+                "Spend everything as you earn it"
               ],
-              correctAnswer: 2,
-              explanation: "Categorizing expenses as you go makes the process easier and provides more accurate budget tracking."
+              correctAnswer: 1,
+              explanation: "Budgeting based on your lowest expected income helps ensure you can always meet your needs."
             },
             {
               id: 16,
-              question: "What's a spending trigger?",
+              question: "What's a good way to track your spending?",
               options: [
-                "A type of gun",
-                "Emotions or situations that lead to unplanned spending",
-                "A budgeting app feature",
-                "A type of expense category"
+                "Don't track it",
+                "Use apps, spreadsheets, or write it down",
+                "Only remember big purchases",
+                "Check your account once a year"
               ],
               correctAnswer: 1,
-              explanation: "Spending triggers are emotional states or situations that often lead to impulse purchases or overspending."
+              explanation: "Regular tracking helps you stay aware of your spending patterns and stick to your budget."
             },
             {
               id: 17,
-              question: "Why is it important to track both income and expenses?",
+              question: "How often should you update your budget?",
               options: [
-                "It's not important",
-                "To see the full picture of your financial flow",
-                "Only expenses matter",
-                "Only income matters"
+                "Never",
+                "When your income or major expenses change",
+                "Every 5 years",
+                "Only when you're broke"
               ],
               correctAnswer: 1,
-              explanation: "Understanding both sides of your financial equation helps you make informed decisions about spending and saving."
+              explanation: "Your budget should evolve with changes in your financial situation."
             },
             {
               id: 18,
-              question: "What should you do with seasonal expenses?",
+              question: "What should you do if your expenses exceed your income?",
               options: [
-                "Ignore them",
-                "Plan and save for them throughout the year",
-                "Use credit cards when they come up",
-                "Ask family for money"
+                "Use credit cards for everything",
+                "Find ways to increase income or decrease expenses",
+                "Ignore the problem",
+                "Stop budgeting"
               ],
               correctAnswer: 1,
-              explanation: "Planning ahead for seasonal expenses like textbooks or holiday gifts helps avoid financial stress."
+              explanation: "You need to balance your budget by either earning more or spending less."
             },
             {
               id: 19,
-              question: "How often should you review your expense tracking data?",
-              options: ["Never", "Once a year", "Weekly or monthly", "Only when problems arise"],
-              correctAnswer: 2,
-              explanation: "Regular review helps you stay aware of your spending patterns and make adjustments as needed."
+              question: "Why is it important to include small purchases in your budget?",
+              options: [
+                "It's not important",
+                "Small purchases add up and can derail your budget",
+                "Only for tax purposes",
+                "To impress others"
+              ],
+              correctAnswer: 1,
+              explanation: "Small, frequent purchases can add up to significant amounts over time."
             },
             {
               id: 20,
-              question: "What's the benefit of using digital expense tracking tools?",
+              question: "What's the benefit of automating your savings?",
               options: [
-                "They're always free",
-                "They automatically categorize and analyze your data",
-                "They prevent all overspending",
-                "They're only for tech experts"
+                "It's more complicated",
+                "It ensures consistent saving without having to remember",
+                "It costs extra money",
+                "There are no benefits"
               ],
               correctAnswer: 1,
-              explanation: "Digital tools can automatically categorize transactions and provide insights that would be time-consuming to generate manually."
+              explanation: "Automation helps you save consistently by removing the need to remember to transfer money."
             }
           ]
         }
@@ -290,142 +308,140 @@ export const coursesData: Course[] = [
   },
   {
     id: 2,
-    title: "Smart Saving Strategies",
-    description: "Discover effective ways to save money and build your financial future.",
-    level: "Beginner",
+    title: "Smart Spending",
+    description: "Develop intelligent spending habits and avoid common financial traps",
+    difficulty: "Beginner",
+    category: "Personal Finance",
+    imageUrl: "/placeholder.svg",
     duration: "1.5 hours",
-    students: 980,
-    topics: [
-      "Setting savings goals",
-      "Automated saving",
-      "Finding the best savings accounts",
-      "Avoiding common spending traps"
-    ],
     lessons: [
       {
         id: 3,
-        title: "Setting Savings Goals",
-        description: "Learn how to set realistic and achievable savings goals.",
-        duration: "25 min",
-        completed: false,
-        locked: false,
+        title: "Needs vs Wants",
+        description: "Learn to distinguish between essential needs and desires",
+        duration: "12 minutes",
         quiz: {
           passingScore: 70,
           questions: [
             {
               id: 21,
-              question: "What makes a savings goal effective?",
+              question: "Which of these is a 'need'?",
               options: [
-                "It should be vague and flexible",
-                "It should be specific, measurable, and time-bound",
-                "It should be impossible to achieve",
-                "It should only be short-term"
+                "Designer clothes",
+                "Food and shelter",
+                "Entertainment subscriptions",
+                "Latest smartphone"
               ],
               correctAnswer: 1,
-              explanation: "SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound) are most effective for saving success."
+              explanation: "Needs are essential for survival and basic living, like food, shelter, and basic clothing."
             },
             {
               id: 22,
-              question: "What is a good first savings goal for students?",
+              question: "Which of these is a 'want'?",
               options: [
-                "Buying a luxury car",
-                "A small emergency fund ($500-$1000)",
-                "A million-dollar retirement fund",
-                "A vacation to Europe"
+                "Rent payment",
+                "Groceries",
+                "Concert tickets",
+                "Medical care"
               ],
-              correctAnswer: 1,
-              explanation: "A small emergency fund provides financial security and is an achievable first goal for most students."
+              correctAnswer: 2,
+              explanation: "Wants are things that enhance your life but aren't essential for survival."
             },
             {
               id: 23,
-              question: "How should you prioritize multiple savings goals?",
+              question: "What should you prioritize in your budget?",
               options: [
-                "Work on all goals equally",
-                "Focus on the most expensive goal first",
-                "Prioritize by importance and timeline",
-                "Choose randomly"
+                "Wants before needs",
+                "Needs before wants",
+                "Both equally",
+                "Neither matters"
               ],
-              correctAnswer: 2,
-              explanation: "Prioritizing by importance and urgency helps you allocate resources effectively and achieve goals systematically."
+              correctAnswer: 1,
+              explanation: "Always cover your essential needs first, then allocate money for wants if possible."
             },
             {
               id: 24,
-              question: "What's the advantage of short-term vs. long-term savings goals?",
+              question: "How can you reduce spending on wants?",
               options: [
-                "Short-term goals are always better",
-                "Long-term goals are always better", 
-                "Short-term goals provide motivation while long-term goals build wealth",
-                "There's no difference"
+                "Never buy anything you want",
+                "Wait 24-48 hours before purchasing non-essential items",
+                "Buy everything immediately",
+                "Only shop when you're emotional"
               ],
-              correctAnswer: 2,
-              explanation: "Short-term goals provide quick motivation and success, while long-term goals build substantial wealth through compound growth."
+              correctAnswer: 1,
+              explanation: "Waiting before purchasing wants helps you avoid impulse buying and consider if you really need the item."
             },
             {
               id: 25,
-              question: "How much should you save for textbooks each semester?",
-              options: ["$50", "$200-$400", "$1000", "$100"],
+              question: "What's a good strategy for managing wants?",
+              options: [
+                "Eliminate all wants from your life",
+                "Set aside a specific amount for discretionary spending",
+                "Use credit for all wants",
+                "Never plan for wants"
+              ],
               correctAnswer: 1,
-              explanation: "Textbooks typically cost $200-$400 per semester, so planning for this expense helps avoid financial stress."
+              explanation: "Budgeting a specific amount for wants helps you enjoy life while staying financially responsible."
             },
             {
               id: 26,
-              question: "What is 'paying yourself first'?",
+              question: "How can peer pressure affect your spending?",
               options: [
-                "Buying things for yourself before others",
-                "Saving money before spending on other things",
-                "Getting a job that pays well",
-                "Using credit cards for purchases"
+                "It has no effect",
+                "It can lead to overspending on wants to fit in",
+                "It always helps you save money",
+                "It only affects wealthy people"
               ],
               correctAnswer: 1,
-              explanation: "Paying yourself first means prioritizing savings by setting aside money before spending on discretionary items."
+              explanation: "Social pressure can lead to spending money on things you don't really need or can't afford."
             },
             {
               id: 27,
-              question: "Why should savings goals be written down?",
+              question: "What's the '24-hour rule'?",
               options: [
-                "It's required by law",
-                "It makes them more concrete and increases commitment",
-                "It's not necessary",
-                "Only for large goals"
+                "Shop for 24 hours straight",
+                "Wait 24 hours before making non-essential purchases",
+                "Return items within 24 hours",
+                "Check prices for 24 hours"
               ],
               correctAnswer: 1,
-              explanation: "Writing down goals makes them more tangible and increases your psychological commitment to achieving them."
+              explanation: "The 24-hour rule helps prevent impulse purchases by giving you time to think."
             },
             {
               id: 28,
-              question: "What should you do when you reach a savings goal?",
+              question: "Which is an example of lifestyle inflation?",
               options: [
-                "Spend all the money immediately",
-                "Celebrate appropriately and set a new goal",
-                "Stop saving altogether",
-                "Feel guilty about having money"
+                "Buying cheaper alternatives",
+                "Increasing spending as income increases",
+                "Saving more money",
+                "Paying off debt"
               ],
               correctAnswer: 1,
-              explanation: "Celebrating achievements reinforces positive behavior, and setting new goals maintains momentum."
+              explanation: "Lifestyle inflation occurs when you increase your spending proportionally with income increases."
             },
             {
               id: 29,
-              question: "How can you make large savings goals less overwhelming?",
+              question: "How can you satisfy wants without overspending?",
               options: [
-                "Ignore them",
-                "Break them into smaller milestones",
-                "Try to save it all at once",
-                "Ask others to save for you"
+                "Use credit cards for everything",
+                "Look for free or low-cost alternatives",
+                "Ignore all wants",
+                "Borrow money from friends"
               ],
               correctAnswer: 1,
-              explanation: "Breaking large goals into smaller milestones makes them feel more achievable and provides regular motivation."
+              explanation: "Finding free or inexpensive ways to enjoy yourself helps balance wants with financial responsibility."
             },
             {
               id: 30,
-              question: "What's a good strategy when you miss a savings target?",
+              question: "What should you ask yourself before buying something you want?",
               options: [
-                "Give up completely",
-                "Analyze what went wrong and adjust your approach",
-                "Blame external factors only",
-                "Set an even higher target"
+                "Nothing, just buy it",
+                "Do I really need this? Can I afford it? Will I use it?",
+                "What will others think?",
+                "Is it on sale?"
               ],
               correctAnswer: 1,
-              explanation: "Learning from setbacks and adjusting your strategy is key to long-term savings success."
+              explanation: "These questions help you make thoughtful spending decisions rather than impulse purchases."
             }
           ]
         }
@@ -434,132 +450,424 @@ export const coursesData: Course[] = [
   },
   {
     id: 3,
-    title: "Understanding Credit and Debt",
-    description: "Navigate the world of credit cards, loans, and debt management responsibly.",
-    level: "Intermediate",
-    duration: "3 hours",
-    students: 756,
-    topics: [
-      "Credit scores and reports",
-      "Responsible credit card use",
-      "Student loan management",
-      "Debt repayment strategies"
-    ],
+    title: "Saving Strategies",
+    description: "Effective methods to build your savings and emergency fund",
+    difficulty: "Intermediate",
+    category: "Savings",
+    imageUrl: "/placeholder.svg",
+    duration: "2.5 hours",
     lessons: [
       {
         id: 4,
-        title: "Credit Basics",
-        description: "Understanding how credit works and its impact on your financial future.",
-        duration: "30 min",
-        completed: false,
-        locked: false,
+        title: "Building an Emergency Fund",
+        description: "Create a financial safety net for unexpected expenses",
+        duration: "18 minutes",
         quiz: {
           passingScore: 70,
           questions: [
             {
               id: 31,
-              question: "What is a credit score?",
+              question: "What is an emergency fund?",
               options: [
-                "Your bank account balance",
-                "A numerical rating of your creditworthiness",
-                "The amount of money you owe",
-                "Your monthly income"
+                "Money for vacation",
+                "Money set aside for unexpected expenses",
+                "Money for shopping",
+                "Money for investments"
               ],
               correctAnswer: 1,
-              explanation: "A credit score is a three-digit number that represents your creditworthiness based on your credit history."
+              explanation: "An emergency fund is money saved specifically for unexpected expenses like medical bills or job loss."
             },
             {
               id: 32,
-              question: "What is the typical range for credit scores?",
-              options: ["0-100", "300-850", "1-10", "100-1000"],
+              question: "How much should be in an emergency fund?",
+              options: [
+                "$100",
+                "3-6 months of living expenses",
+                "1 month of income",
+                "Whatever feels right"
+              ],
               correctAnswer: 1,
-              explanation: "Most credit scores range from 300 to 850, with higher scores indicating better creditworthiness."
+              explanation: "Most experts recommend 3-6 months of living expenses to cover major emergencies."
             },
             {
               id: 33,
-              question: "Which factor has the biggest impact on your credit score?",
+              question: "Where should you keep your emergency fund?",
               options: [
-                "Length of credit history",
-                "Payment history",
-                "Types of credit",
-                "New credit inquiries"
+                "Under your mattress",
+                "In a high-yield savings account",
+                "Invested in stocks",
+                "In your checking account"
               ],
               correctAnswer: 1,
-              explanation: "Payment history accounts for about 35% of your credit score, making it the most important factor."
+              explanation: "A high-yield savings account provides easy access while earning some interest."
             },
             {
               id: 34,
-              question: "How often should you check your credit report?",
-              options: ["Never", "Once a year", "At least once a year, ideally more", "Only when applying for loans"],
-              correctAnswer: 2,
-              explanation: "Regular monitoring helps you catch errors or fraud early and understand your credit standing."
+              question: "What qualifies as a true emergency?",
+              options: [
+                "A sale on clothes you want",
+                "Unexpected medical bills or job loss",
+                "A vacation opportunity",
+                "A new gadget release"
+              ],
+              correctAnswer: 1,
+              explanation: "True emergencies are unexpected, necessary expenses that can't wait or be planned for."
             },
             {
               id: 35,
-              question: "What is credit utilization?",
+              question: "How should you start building an emergency fund?",
               options: [
-                "How often you use credit cards",
-                "The percentage of available credit you're using",
-                "The number of credit cards you have",
-                "Your credit limit"
+                "Wait until you have a lot of money",
+                "Start small, even $25-50 per month",
+                "Only save windfalls",
+                "Don't worry about it while in college"
               ],
               correctAnswer: 1,
-              explanation: "Credit utilization is the ratio of your credit card balances to your credit limits, ideally kept below 30%."
+              explanation: "Starting small and building consistently is better than waiting for the 'perfect' time."
             },
             {
               id: 36,
-              question: "What happens if you miss a credit card payment?",
+              question: "What should you do after using your emergency fund?",
               options: [
-                "Nothing happens",
-                "Late fees and potential damage to credit score",
-                "Your card is automatically cancelled",
-                "You get a reward"
+                "Leave it empty",
+                "Replenish it as soon as possible",
+                "Use it for wants",
+                "Close the account"
               ],
               correctAnswer: 1,
-              explanation: "Late payments can result in fees and negative marks on your credit report, damaging your credit score."
+              explanation: "After using emergency funds, prioritize rebuilding them for future emergencies."
             },
             {
               id: 37,
-              question: "How long do negative marks typically stay on your credit report?",
-              options: ["1 year", "3 years", "7 years", "Forever"],
-              correctAnswer: 2,
-              explanation: "Most negative information remains on your credit report for 7 years, though some items may stay longer."
+              question: "Should you use your emergency fund for planned expenses?",
+              options: [
+                "Yes, always",
+                "No, only for true emergencies",
+                "Sometimes",
+                "It doesn't matter"
+              ],
+              correctAnswer: 1,
+              explanation: "Emergency funds should be reserved for truly unexpected, urgent expenses."
             },
             {
               id: 38,
-              question: "What is the minimum payment on a credit card?",
+              question: "What's a good way to automate emergency fund savings?",
               options: [
-                "The full balance",
-                "A small percentage of the balance plus fees",
-                "Always $25",
-                "Whatever you want to pay"
+                "Don't automate it",
+                "Set up automatic transfers from checking to savings",
+                "Only save manually",
+                "Use credit cards"
               ],
               correctAnswer: 1,
-              explanation: "The minimum payment is typically 2-3% of the balance plus any fees, but paying only this amount results in high interest charges."
+              explanation: "Automatic transfers help you consistently build your emergency fund without having to remember."
             },
             {
               id: 39,
-              question: "Why might having no credit history be problematic?",
+              question: "How can students start an emergency fund with limited income?",
               options: [
-                "It's actually ideal",
-                "Lenders can't assess your creditworthiness",
-                "You'll automatically get the best rates",
-                "It has no impact"
+                "They can't",
+                "Save small amounts consistently, like spare change",
+                "Wait until after graduation",
+                "Only save large amounts"
               ],
               correctAnswer: 1,
-              explanation: "No credit history makes you appear risky to lenders since they have no data to evaluate your payment reliability."
+              explanation: "Even small, consistent contributions can build up over time and create a helpful emergency buffer."
             },
             {
               id: 40,
-              question: "What's the best way to build credit as a student?",
+              question: "What's the biggest benefit of having an emergency fund?",
               options: [
-                "Apply for multiple credit cards",
-                "Get a student credit card and use it responsibly",
-                "Take out large loans",
-                "Never use any credit"
+                "Earning high returns",
+                "Peace of mind and financial security",
+                "Impressing others",
+                "Tax benefits"
               ],
               correctAnswer: 1,
-              explanation: "A student credit card used responsibly (low balances, on-time payments) is an excellent way to build creditHistory."
+              explanation: "The main benefit is the security and peace of mind knowing you can handle unexpected expenses."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: "Credit and Debt Management",
+    description: "Understanding credit scores, managing debt, and building good credit habits",
+    difficulty: "Intermediate",
+    category: "Credit",
+    imageUrl: "/placeholder.svg",
+    duration: "3 hours",
+    lessons: [
+      {
+        id: 5,
+        title: "Understanding Credit Scores",
+        description: "Learn what affects your credit score and how to improve it",
+        duration: "25 minutes",
+        quiz: {
+          passingScore: 70,
+          questions: [
+            {
+              id: 41,
+              question: "What is a credit score?",
+              options: [
+                "Your bank account balance",
+                "A number representing your creditworthiness",
+                "Your annual income",
+                "The amount of debt you have"
+              ],
+              correctAnswer: 1,
+              explanation: "A credit score is a numerical representation of how likely you are to repay borrowed money."
+            },
+            {
+              id: 42,
+              question: "What's the typical range for credit scores?",
+              options: [
+                "0-100",
+                "300-850",
+                "1-10",
+                "100-1000"
+              ],
+              correctAnswer: 1,
+              explanation: "FICO credit scores typically range from 300 to 850, with higher scores being better."
+            },
+            {
+              id: 43,
+              question: "What's considered a good credit score?",
+              options: [
+                "300-500",
+                "670-739",
+                "200-400",
+                "900-1000"
+              ],
+              correctAnswer: 1,
+              explanation: "A credit score of 670-739 is generally considered good by most lenders."
+            },
+            {
+              id: 44,
+              question: "What factor has the biggest impact on your credit score?",
+              options: [
+                "Your age",
+                "Payment history",
+                "Your income",
+                "Where you live"
+              ],
+              correctAnswer: 1,
+              explanation: "Payment history accounts for about 35% of your credit score and is the most important factor."
+            },
+            {
+              id: 45,
+              question: "What is credit utilization?",
+              options: [
+                "How often you check your credit",
+                "The percentage of available credit you're using",
+                "The number of credit cards you have",
+                "How long you've had credit"
+              ],
+              correctAnswer: 1,
+              explanation: "Credit utilization is the ratio of your credit card balances to your credit limits."
+            },
+            {
+              id: 46,
+              question: "What's a good credit utilization ratio?",
+              options: [
+                "90-100%",
+                "Below 30%, ideally below 10%",
+                "50-70%",
+                "It doesn't matter"
+              ],
+              correctAnswer: 1,
+              explanation: "Keeping utilization below 30% is good, but below 10% is even better for your credit score."
+            },
+            {
+              id: 47,
+              question: "How long do negative items typically stay on your credit report?",
+              options: [
+                "Forever",
+                "7 years for most items",
+                "1 year",
+                "30 days"
+              ],
+              correctAnswer: 1,
+              explanation: "Most negative items like late payments stay on your credit report for 7 years."
+            },
+            {
+              id: 48,
+              question: "How often should you check your credit report?",
+              options: [
+                "Never",
+                "At least once a year",
+                "Every day",
+                "Only when applying for credit"
+              ],
+              correctAnswer: 1,
+              explanation: "You should check your credit report at least annually to look for errors or signs of identity theft."
+            },
+            {
+              id: 49,
+              question: "What can hurt your credit score?",
+              options: [
+                "Paying bills on time",
+                "Late payments and high credit utilization",
+                "Having a job",
+                "Saving money"
+              ],
+              correctAnswer: 1,
+              explanation: "Late payments and high credit utilization are two major factors that can negatively impact your score."
+            },
+            {
+              id: 50,
+              question: "How can you start building credit with no credit history?",
+              options: [
+                "You can't",
+                "Consider a secured credit card or becoming an authorized user",
+                "Take out a large loan",
+                "Wait until you're 30"
+              ],
+              correctAnswer: 1,
+              explanation: "Secured credit cards and being added as an authorized user are good ways to start building credit."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: 5,
+    title: "Investment Basics",
+    description: "Introduction to investing and building long-term wealth",
+    difficulty: "Advanced",
+    category: "Investing",
+    imageUrl: "/placeholder.svg",
+    duration: "4 hours",
+    lessons: [
+      {
+        id: 6,
+        title: "Introduction to Investing",
+        description: "Basic concepts and principles of investing",
+        duration: "30 minutes",
+        quiz: {
+          passingScore: 70,
+          questions: [
+            {
+              id: 51,
+              question: "What is investing?",
+              options: [
+                "Keeping money in a checking account",
+                "Putting money into assets that may grow in value over time",
+                "Spending money on consumer goods",
+                "Loaning money to friends"
+              ],
+              correctAnswer: 1,
+              explanation: "Investing involves purchasing assets with the expectation that they will generate income or appreciate in value."
+            },
+            {
+              id: 52,
+              question: "What is the relationship between risk and return?",
+              options: [
+                "Higher risk usually means higher potential returns",
+                "Risk and return are unrelated",
+                "Lower risk always means higher returns",
+                "All investments have the same risk"
+              ],
+              correctAnswer: 0,
+              explanation: "Generally, investments with higher potential returns come with higher risk of loss."
+            },
+            {
+              id: 53,
+              question: "What is compound interest?",
+              options: [
+                "Interest paid only on the principal",
+                "Interest earned on both principal and previously earned interest",
+                "A type of bank account",
+                "Interest that decreases over time"
+              ],
+              correctAnswer: 1,
+              explanation: "Compound interest is when you earn interest on your original investment plus any interest already earned."
+            },
+            {
+              id: 54,
+              question: "What is diversification?",
+              options: [
+                "Putting all money in one investment",
+                "Spreading investments across different assets to reduce risk",
+                "Only investing in stocks",
+                "Avoiding all investments"
+              ],
+              correctAnswer: 1,
+              explanation: "Diversification means spreading your investments across different types of assets to reduce overall risk."
+            },
+            {
+              id: 55,
+              question: "What is a stock?",
+              options: [
+                "A loan to a company",
+                "Ownership share in a company",
+                "A savings account",
+                "A type of bond"
+              ],
+              correctAnswer: 1,
+              explanation: "A stock represents partial ownership in a company and gives you a claim on its assets and earnings."
+            },
+            {
+              id: 56,
+              question: "What is a bond?",
+              options: [
+                "Ownership in a company",
+                "A loan you make to a government or corporation",
+                "A type of savings account",
+                "A gambling activity"
+              ],
+              correctAnswer: 1,
+              explanation: "A bond is essentially an IOU where you lend money and receive regular interest payments."
+            },
+            {
+              id: 57,
+              question: "When should most people start investing?",
+              options: [
+                "Only after age 40",
+                "As early as possible, even with small amounts",
+                "Only when wealthy",
+                "Never"
+              ],
+              correctAnswer: 1,
+              explanation: "Starting early, even with small amounts, allows compound interest to work in your favor over time."
+            },
+            {
+              id: 58,
+              question: "What should you do before investing?",
+              options: [
+                "Quit your job",
+                "Build an emergency fund and pay off high-interest debt",
+                "Buy a house",
+                "Take out loans"
+              ],
+              correctAnswer: 1,
+              explanation: "You should have financial stability with an emergency fund and handle high-interest debt before investing."
+            },
+            {
+              id: 59,
+              question: "What is dollar-cost averaging?",
+              options: [
+                "Investing a lump sum all at once",
+                "Investing the same amount regularly regardless of market conditions",
+                "Only investing when markets are low",
+                "Avoiding investments altogether"
+              ],
+              correctAnswer: 1,
+              explanation: "Dollar-cost averaging involves investing fixed amounts regularly, which can help reduce the impact of market volatility."
+            },
+            {
+              id: 60,
+              question: "What's a good beginner investment option?",
+              options: [
+                "Individual stocks only",
+                "Index funds or ETFs",
+                "Cryptocurrency only",
+                "Real estate only"
+              ],
+              correctAnswer: 1,
+              explanation: "Index funds and ETFs provide instant diversification and are often good options for beginner investors."
             }
           ]
         }
