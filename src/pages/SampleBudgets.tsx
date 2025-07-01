@@ -11,6 +11,11 @@ import Footer from '@/components/Footer';
 const SampleBudgets = () => {
   const navigate = useNavigate();
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState('ai-assistant');
+
+  const handleAuthRequired = () => {
+    // Handle auth requirement if needed
+  };
 
   const budgetTemplates = [
     {
@@ -63,7 +68,11 @@ const SampleBudgets = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header 
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        onAuthRequired={handleAuthRequired}
+      />
       
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">

@@ -18,6 +18,7 @@ const LessonView = () => {
   const { isAuthenticated } = useAuth();
   const [videoWatched, setVideoWatched] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [activeSection, setActiveSection] = useState('courses');
 
   const course = coursesData.find(c => c.id === parseInt(courseId || '0'));
   const lesson = course?.lessons.find(l => l.id === parseInt(lessonId || '0'));
@@ -37,10 +38,18 @@ const LessonView = () => {
     }
   }, [isVideoWatched]);
 
+  const handleAuthRequired = () => {
+    // Handle auth requirement if needed
+  };
+
   if (!course || !lesson) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header 
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          onAuthRequired={handleAuthRequired}
+        />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <p>Lesson not found</p>
         </div>
@@ -73,7 +82,11 @@ const LessonView = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header 
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        onAuthRequired={handleAuthRequired}
+      />
       
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
@@ -194,8 +207,8 @@ const LessonView = () => {
                   </div>
                 ) : (
                   <QuizComponent
-                    lessonId={lesson.id}
-                    onQuizComplete={handleQuizComplete}
+                    quiz={lesson.quiz}
+                    onComplete={handleQuizComplete}
                   />
                 )}
               </CardContent>
