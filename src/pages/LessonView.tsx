@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, Clock, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -22,39 +22,45 @@ const LessonView = () => {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentStep, setCurrentStep] = useState<'video' | 'quiz' | 'completed'>('video');
   const [activeSection, setActiveSection] = useState('courses');
+  const [videoWatched, setVideoWatched] = useState(false);
+
+  const courseIdNum = parseInt(courseId || '0');
+  const lessonIdNum = parseInt(lessonId || '0');
 
   const { 
     progress: lessonProgress, 
     markVideoWatched, 
     markQuizPassed,
-    videoWatched,
-    quizPassed,
+    videoWatched: dbVideoWatched,
+    quizPassed: dbQuizPassed,
     isCompleted 
-  } = useLessonProgress(parseInt(courseId || '0'), parseInt(lessonId || '0'));
+  } = useLessonProgress(courseIdNum, lessonIdNum);
 
-  const { updateProgress } = useCourseProgress(parseInt(courseId || '0'));
+  const { updateProgress } = useCourseProgress(courseIdNum);
 
   useEffect(() => {
-    const foundCourse = coursesData.find(c => c.id === parseInt(courseId || '0'));
+    const foundCourse = coursesData.find(c => c.id === courseIdNum);
     if (foundCourse) {
       setCourse(foundCourse);
-      const foundLesson = foundCourse.lessons.find(l => l.id === parseInt(lessonId || '0'));
+      const foundLesson = foundCourse.lessons.find(l => l.id === lessonIdNum);
       if (foundLesson) {
         setLesson(foundLesson);
+        setVideoWatched(dbVideoWatched);
         
         // Set current step based on progress
         if (isCompleted) {
           setCurrentStep('completed');
-        } else if (videoWatched && !quizPassed) {
+        } else if (dbVideoWatched && !dbQuizPassed) {
           setCurrentStep('quiz');
         } else {
           setCurrentStep('video');
         }
       }
     }
-  }, [courseId, lessonId, isCompleted, videoWatched, quizPassed]);
+  }, [courseIdNum, lessonIdNum, isCompleted, dbVideoWatched, dbQuizPassed]);
 
   const handleVideoComplete = async () => {
+    setVideoWatched(true);
     if (isAuthenticated) {
       await markVideoWatched();
     }
@@ -72,10 +78,10 @@ const LessonView = () => {
         
         // Update course progress
         if (course) {
-          const completedLessons = course.lessons.filter(l => 
-            l.id === lesson?.id || lessonProgress?.completed_at
+          const completedLessons = course.lessons.filter((l, index) => 
+            l.id === lesson?.id || index < course.lessons.findIndex(cl => cl.id === lesson?.id)
           ).length;
-          const progressPercentage = (completedLessons / course.lessons.length) * 100;
+          const progressPercentage = Math.min(100, (completedLessons / course.lessons.length) * 100);
           await updateProgress(progressPercentage);
         }
       }
@@ -187,18 +193,18 @@ const LessonView = () => {
             
             <div className={`flex items-center space-x-2 ${
               currentStep === 'quiz' ? 'text-cerulean-600' : 
-              quizPassed ? 'text-green-600' : 'text-gray-400'
+              dbQuizPassed ? 'text-green-600' : 'text-gray-400'
             }`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 currentStep === 'quiz' ? 'bg-cerulean-100' : 
-                quizPassed ? 'bg-green-100' : 'bg-gray-100'
+                dbQuizPassed ? 'bg-green-100' : 'bg-gray-100'
               }`}>
-                {quizPassed ? <CheckCircle className="h-5 w-5" /> : <span className="text-sm font-bold">?</span>}
+                {dbQuizPassed ? <CheckCircle className="h-5 w-5" /> : <span className="text-sm font-bold">?</span>}
               </div>
               <span className="font-medium">Take Quiz</span>
             </div>
             
-            <div className={`h-px flex-1 ${quizPassed ? 'bg-green-300' : 'bg-gray-300'}`} />
+            <div className={`h-px flex-1 ${dbQuizPassed ? 'bg-green-300' : 'bg-gray-300'}`} />
             
             <div className={`flex items-center space-x-2 ${
               currentStep === 'completed' ? 'text-green-600' : 'text-gray-400'
@@ -223,21 +229,23 @@ const LessonView = () => {
               <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center mb-4">
                 <div className="text-center text-white">
                   <Play className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">Video Player Placeholder</p>
-                  <p className="text-sm opacity-75">Click "Mark as Watched" to continue</p>
+                  <p className="text-lg font-medium">Video: {lesson.title}</p>
+                  <p className="text-sm opacity-75">Duration: {lesson.duration}</p>
+                  <p className="text-xs opacity-50 mt-2">Click "Mark as Watched" when finished</p>
                 </div>
               </div>
               <Button 
                 onClick={handleVideoComplete}
                 className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white"
+                disabled={videoWatched}
               >
-                Mark Video as Watched
+                {videoWatched ? 'Video Completed ✓' : 'Mark Video as Watched'}
               </Button>
             </CardContent>
           </Card>
         )}
 
-        {currentStep === 'quiz' && (
+        {currentStep === 'quiz' && lesson.quiz && (
           <QuizComponent 
             quiz={lesson.quiz}
             onComplete={handleQuizComplete}
@@ -269,7 +277,7 @@ const LessonView = () => {
                     onClick={() => navigate(`/course/${courseId}`)}
                     className="bg-cactus-600 hover:bg-cactus-700 text-white"
                   >
-                    Back to Course
+                    Course Complete! Return to Course
                   </Button>
                 )}
                 <Button 

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { siteContent } from '@/data/siteContent';
 import { useAuth } from '@/contexts/AuthContext';
 import ChatInterface from './ChatInterface';
+import SampleBudgets from './SampleBudgets';
 
 const iconMap = {
   Calculator, PiggyBank, TrendingUp, MessageCircle
@@ -14,6 +15,7 @@ const iconMap = {
 
 const AIAssistant = () => {
   const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showSampleBudgets, setShowSampleBudgets] = useState(false);
   const { isAuthenticated } = useAuth();
   
   const features = siteContent.aiAssistant.features.map((feature, index) => ({
@@ -27,6 +29,10 @@ const AIAssistant = () => {
       return;
     }
     setShowChatInterface(true);
+  };
+
+  const handleViewSampleBudgets = () => {
+    setShowSampleBudgets(true);
   };
 
   return (
@@ -118,7 +124,11 @@ const AIAssistant = () => {
                 >
                   Start Chat with Budget Bot
                 </Button>
-                <Button variant="outline" className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
+                  onClick={handleViewSampleBudgets}
+                >
                   View Sample Budgets
                 </Button>
               </div>
@@ -141,6 +151,16 @@ const AIAssistant = () => {
             </div>
             <div className="flex-1 overflow-hidden">
               <ChatInterface />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSampleBudgets && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <SampleBudgets onClose={() => setShowSampleBudgets(false)} />
             </div>
           </div>
         </div>
