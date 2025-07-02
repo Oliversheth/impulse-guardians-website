@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,12 +9,12 @@ import { coursesData } from '@/data/coursesData';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useAuth } from '@/contexts/AuthContext';
 import QuizComponent from '@/components/QuizComponent';
+import YouTubePlayer from '@/components/YouTubePlayer';
 
 const LessonView = () => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [videoWatched, setVideoWatched] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
 
   const course = coursesData.find(c => c.id === parseInt(courseId || '0'));
@@ -23,17 +23,14 @@ const LessonView = () => {
   const { 
     progress, 
     loading, 
+    updateVideoProgress,
     updateVideoWatched, 
     updateQuizPassed, 
     isVideoWatched, 
-    isQuizPassed 
+    isQuizPassed,
+    videoProgress,
+    isVideoCompleted
   } = useLessonProgress(parseInt(courseId || '0'), parseInt(lessonId || '0'));
-
-  useEffect(() => {
-    if (isVideoWatched) {
-      setVideoWatched(true);
-    }
-  }, [isVideoWatched]);
 
   if (!course || !lesson) {
     return (
@@ -47,11 +44,12 @@ const LessonView = () => {
   const nextLesson = course.lessons[currentLessonIndex + 1];
   const prevLesson = course.lessons[currentLessonIndex - 1];
 
-  const handleVideoComplete = () => {
-    if (!videoWatched) {
-      setVideoWatched(true);
-      updateVideoWatched();
-    }
+  const handleVideoProgressUpdate = (progressPercentage: number, currentTime: number, duration: number) => {
+    updateVideoProgress(progressPercentage, currentTime, duration);
+  };
+
+  const handleVideoCompleted = () => {
+    updateVideoWatched();
   };
 
   const handleQuizComplete = (passed: boolean, score: number) => {
@@ -64,8 +62,6 @@ const LessonView = () => {
       }
     }
   };
-
-  const canTakeQuiz = videoWatched || isVideoWatched;
 
   // Extract YouTube video ID from URL
   const getYouTubeVideoId = (url: string) => {
@@ -114,52 +110,21 @@ const LessonView = () => {
           {/* Video Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Play className="h-5 w-5 mr-2 text-cerulean-600" />
-                Video Lesson
-              </CardTitle>
+              <CardTitle>Video Lesson</CardTitle>
             </CardHeader>
             <CardContent>
               {videoId ? (
-                <div className="space-y-4">
-                  <div className="aspect-video">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      src={`https://www.youtube.com/embed/${videoId}`}
-                      title={lesson.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="rounded-lg"
-                    ></iframe>
-                  </div>
-                  {!videoWatched && !isVideoWatched && (
-                    <div className="text-center">
-                      <Button 
-                        onClick={handleVideoComplete}
-                        className="bg-cerulean-600 hover:bg-cerulean-700"
-                      >
-                        Mark Video as Watched
-                      </Button>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Click this button after watching the video to unlock the quiz
-                      </p>
-                    </div>
-                  )}
-                  {(videoWatched || isVideoWatched) && (
-                    <div className="flex items-center text-green-600">
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Video completed</span>
-                    </div>
-                  )}
-                </div>
+                <YouTubePlayer
+                  videoId={videoId}
+                  onProgressUpdate={handleVideoProgressUpdate}
+                  onVideoCompleted={handleVideoCompleted}
+                  initialProgress={videoProgress}
+                  isCompleted={isVideoCompleted}
+                />
               ) : (
                 <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
                   <div className="text-center text-white">
-                    <Play className="h-16 w-16 mx-auto mb-4 opacity-70" />
-                    <p className="text-lg font-semibold">{lesson.title}</p>
-                    <p className="text-sm opacity-70">Video content would be here</p>
+                    <p className="text-lg font-semibold">Video not available</p>
                   </div>
                 </div>
               )}
@@ -172,12 +137,15 @@ const LessonView = () => {
               <CardTitle>Knowledge Check</CardTitle>
             </CardHeader>
             <CardContent>
-              {!canTakeQuiz ? (
+              {!isVideoCompleted ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">
-                    Complete the video lesson to unlock the quiz
+                    Watch at least 90% of the video to unlock the quiz
                   </p>
-                  <Button disabled variant="outline">
+                  <div className="text-sm text-gray-400">
+                    Current progress: {Math.round(videoProgress)}%
+                  </div>
+                  <Button disabled variant="outline" className="mt-4">
                     Quiz Locked
                   </Button>
                 </div>

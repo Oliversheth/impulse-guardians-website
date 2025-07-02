@@ -71,6 +71,9 @@ export type Database = {
           lesson_id: number
           quiz_passed: boolean | null
           user_id: string
+          video_completed_at: string | null
+          video_duration_watched: number | null
+          video_progress_percentage: number | null
           video_watched: boolean | null
         }
         Insert: {
@@ -80,6 +83,9 @@ export type Database = {
           lesson_id: number
           quiz_passed?: boolean | null
           user_id: string
+          video_completed_at?: string | null
+          video_duration_watched?: number | null
+          video_progress_percentage?: number | null
           video_watched?: boolean | null
         }
         Update: {
@@ -89,6 +95,9 @@ export type Database = {
           lesson_id?: number
           quiz_passed?: boolean | null
           user_id?: string
+          video_completed_at?: string | null
+          video_duration_watched?: number | null
+          video_progress_percentage?: number | null
           video_watched?: boolean | null
         }
         Relationships: []
