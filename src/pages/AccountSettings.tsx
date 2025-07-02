@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { ArrowLeft, User, Lock, Mail } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
 
 const AccountSettings = () => {
   const { user } = useAuth();
@@ -97,13 +96,6 @@ const AccountSettings = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <Link to="/" className="inline-flex items-center text-cerulean-600 hover:text-cerulean-700">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </div>
-
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-cactus-800">Account Settings</h1>

@@ -1,11 +1,22 @@
 
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleSectionNavigation = (sectionId: string) => {
-    // Navigate to home page and then scroll to section
-    window.location.href = `/#${sectionId}`;
+    if (location.pathname === '/') {
+      // On Index page, scroll to section (this would need to be handled by the parent)
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // On other pages, navigate to home with section
+      navigate(`/#${sectionId}`);
+    }
   };
 
   return (

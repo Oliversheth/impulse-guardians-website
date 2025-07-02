@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Menu, X, User, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   activeSection: string;
@@ -21,6 +21,8 @@ interface HeaderProps {
 const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -34,15 +36,38 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       onAuthRequired();
       return;
     }
-    setActiveSection(sectionId);
+
+    if (location.pathname === '/') {
+      // On Index page, use section navigation
+      setActiveSection(sectionId);
+    } else {
+      // On other pages, navigate to home with section
+      if (sectionId === 'home') {
+        navigate('/');
+      } else {
+        navigate(`/#${sectionId}`);
+      }
+    }
     setIsMenuOpen(false);
   };
 
   const handleGetStartedClick = () => {
     if (isAuthenticated) {
-      setActiveSection('courses');
+      if (location.pathname === '/') {
+        setActiveSection('courses');
+      } else {
+        navigate('/#courses');
+      }
     } else {
       onAuthRequired();
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname === '/') {
+      setActiveSection('home');
+    } else {
+      navigate('/');
     }
   };
 
@@ -51,12 +76,23 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     return user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
   };
 
+  const isActiveNav = (itemId: string) => {
+    if (location.pathname === '/') {
+      return activeSection === itemId;
+    }
+    // For non-Index pages, highlight based on route
+    if (itemId === 'courses' && location.pathname.startsWith('/course')) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveSection('home')}>
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={handleLogoClick}>
             <img 
               src="/lovable-uploads/fc12e82d-c153-4ef3-92d4-c698a1ca2f55.png" 
               alt="NoImpulse Logo" 
@@ -75,7 +111,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                 key={item.id}
                 onClick={() => handleNavClick(item.id, item.requiresAuth)}
                 className={`transition-colors ${
-                  activeSection === item.id
+                  isActiveNav(item.id)
                     ? 'text-cerulean-600 font-semibold'
                     : 'text-cactus-700 hover:text-cerulean-600'
                 }`}
@@ -136,7 +172,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                   key={item.id}
                   onClick={() => handleNavClick(item.id, item.requiresAuth)}
                   className={`text-left transition-colors ${
-                    activeSection === item.id
+                    isActiveNav(item.id)
                       ? 'text-cerulean-600 font-semibold'
                       : 'text-cactus-700 hover:text-cerulean-600'
                   }`}
