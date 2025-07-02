@@ -26,6 +26,9 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
+  // Use 70% as the minimum passing score
+  const effectivePassingScore = Math.max(quiz.passingScore, 70);
+
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswers(prev => ({
       ...prev,
@@ -71,13 +74,13 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
 
   const handleFinishQuiz = () => {
     const score = calculateScore();
-    const passed = score >= quiz.passingScore;
+    const passed = score >= effectivePassingScore;
     onComplete(passed, score);
   };
 
   if (showResults) {
     const score = calculateScore();
-    const passed = score >= quiz.passingScore;
+    const passed = score >= effectivePassingScore;
 
     return (
       <Card className={`border-2 ${passed ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
@@ -95,7 +98,7 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
             <p className={`text-lg ${passed ? 'text-green-700' : 'text-red-700'}`}>
               {passed 
                 ? `Congratulations! You passed with ${score}%.`
-                : `You need ${quiz.passingScore}% to pass. You scored ${score}%.`
+                : `You need ${effectivePassingScore}% to pass. You scored ${score}%.`
               }
             </p>
           </div>
@@ -224,7 +227,7 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
 
         <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
           <p className="text-sm text-yellow-800">
-            <strong>Passing Score:</strong> {quiz.passingScore}% · You can retake this quiz if needed.
+            <strong>Passing Score:</strong> {effectivePassingScore}% · You can retake this quiz if needed.
           </p>
         </div>
       </CardContent>
