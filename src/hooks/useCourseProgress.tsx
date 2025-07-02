@@ -24,7 +24,7 @@ export const useCourseProgress = (courseId: number) => {
         .select('*')
         .eq('user_id', user?.id)
         .eq('course_id', courseId)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching course progress:', error);
@@ -63,12 +63,18 @@ export const useCourseProgress = (courseId: number) => {
     if (!user || !progress) return;
 
     try {
+      const updateData: any = {
+        progress_percentage: progressPercentage
+      };
+
+      // Mark course as completed if 100%
+      if (progressPercentage >= 100) {
+        updateData.completed_at = new Date().toISOString();
+      }
+
       const { data, error } = await supabase
         .from('course_progress')
-        .update({ 
-          progress_percentage: progressPercentage,
-          completed_at: progressPercentage >= 100 ? new Date().toISOString() : null
-        })
+        .update(updateData)
         .eq('id', progress.id)
         .select()
         .single();

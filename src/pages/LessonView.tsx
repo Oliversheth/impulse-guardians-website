@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { coursesData } from '@/data/coursesData';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
+import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegration';
 import { useAuth } from '@/contexts/AuthContext';
 import QuizComponent from '@/components/QuizComponent';
 import YouTubePlayer from '@/components/YouTubePlayer';
@@ -19,6 +20,7 @@ const LessonView = () => {
 
   const course = coursesData.find(c => c.id === parseInt(courseId || '0'));
   const lesson = course?.lessons.find(l => l.id === parseInt(lessonId || '0'));
+  const integratedProgress = useCourseProgressIntegration(parseInt(courseId || '0'));
   
   const { 
     progress, 
@@ -32,6 +34,8 @@ const LessonView = () => {
     isVideoCompleted
   } = useLessonProgress(parseInt(courseId || '0'), parseInt(lessonId || '0'));
 
+  const currentLessonData = integratedProgress.lessons.find(l => l.id === parseInt(lessonId || '0'));
+
   if (!course || !lesson) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -40,9 +44,34 @@ const LessonView = () => {
     );
   }
 
+  // Check if lesson is locked
+  if (currentLessonData?.locked) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center">
+          <Lock className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h1 className="text-2xl font-bold text-gray-600 mb-4">Lesson Locked</h1>
+          <p className="text-gray-500 mb-6">
+            Complete the previous lesson to unlock this one.
+          </p>
+          <Button 
+            onClick={() => navigate(`/course/${courseId}`)}
+            className="bg-cerulean-600 hover:bg-cerulean-700"
+          >
+            Back to Course
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const currentLessonIndex = course.lessons.findIndex(l => l.id === lesson.id);
   const nextLesson = course.lessons[currentLessonIndex + 1];
   const prevLesson = course.lessons[currentLessonIndex - 1];
+
+  // Check if next lesson is unlocked
+  const nextLessonData = nextLesson ? integratedProgress.lessons.find(l => l.id === nextLesson.id) : null;
+  const isNextLessonUnlocked = nextLessonData ? !nextLessonData.locked : false;
 
   const handleVideoProgressUpdate = (progressPercentage: number, currentTime: number, duration: number) => {
     updateVideoProgress(progressPercentage, currentTime, duration);
@@ -55,7 +84,8 @@ const LessonView = () => {
   const handleQuizComplete = (passed: boolean, score: number) => {
     if (passed) {
       updateQuizPassed();
-      if (nextLesson) {
+      // Navigate to next lesson if available and unlocked, otherwise back to course
+      if (nextLesson && isNextLessonUnlocked) {
         navigate(`/course/${courseId}/lesson/${nextLesson.id}`);
       } else {
         navigate(`/course/${courseId}`);
@@ -158,8 +188,9 @@ const LessonView = () => {
                     <Button 
                       onClick={() => navigate(`/course/${courseId}/lesson/${nextLesson.id}`)}
                       className="bg-cerulean-600 hover:bg-cerulean-700"
+                      disabled={!isNextLessonUnlocked}
                     >
-                      Next Lesson
+                      {isNextLessonUnlocked ? 'Next Lesson' : 'Complete Course to Continue'}
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   ) : (
@@ -203,29 +234,46 @@ const LessonView = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {course.lessons.map((courseLesson, index) => (
+                {integratedProgress.lessons.map((courseLesson, index) => (
                   <div 
                     key={courseLesson.id}
                     className={`flex items-center p-2 rounded cursor-pointer transition-colors ${
                       courseLesson.id === lesson.id 
                         ? 'bg-cerulean-50 border border-cerulean-200' 
+                        : courseLesson.locked
+                        ? 'opacity-50 cursor-not-allowed'
                         : 'hover:bg-gray-50'
                     }`}
-                    onClick={() => navigate(`/course/${courseId}/lesson/${courseLesson.id}`)}
+                    onClick={() => {
+                      if (!courseLesson.locked) {
+                        navigate(`/course/${courseId}/lesson/${courseLesson.id}`)
+                      }
+                    }}
                   >
                     <div className="mr-3">
                       {courseLesson.completed ? (
                         <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : courseLesson.locked ? (
+                        <Lock className="h-5 w-5 text-gray-400" />
                       ) : (
                         <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
                       )}
                     </div>
                     <div className="flex-1">
                       <p className={`text-sm font-medium ${
-                        courseLesson.id === lesson.id ? 'text-cerulean-700' : 'text-gray-700'
+                        courseLesson.id === lesson.id 
+                          ? 'text-cerulean-700' 
+                          : courseLesson.locked 
+                          ? 'text-gray-400'
+                          : 'text-gray-700'
                       }`}>
                         Lesson {index + 1}: {courseLesson.title}
                       </p>
+                      {courseLesson.videoProgress > 0 && !courseLesson.completed && (
+                        <p className="text-xs text-cerulean-600">
+                          {courseLesson.videoProgress}% watched
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -251,7 +299,7 @@ const LessonView = () => {
                   <Button 
                     className="w-full bg-cerulean-600 hover:bg-cerulean-700"
                     onClick={() => navigate(`/course/${courseId}/lesson/${nextLesson.id}`)}
-                    disabled={!isQuizPassed}
+                    disabled={!isQuizPassed || !isNextLessonUnlocked}
                   >
                     Next Lesson
                     <ArrowRight className="h-4 w-4 ml-2" />
