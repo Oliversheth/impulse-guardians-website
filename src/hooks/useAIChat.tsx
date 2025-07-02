@@ -9,6 +9,11 @@ interface Message {
   content: string;
   isUser: boolean;
   timestamp: Date;
+  files?: Array<{
+    name: string;
+    type: string;
+    content: string; // base64 content
+  }>;
 }
 
 export const useAIChat = () => {
@@ -25,7 +30,7 @@ export const useAIChat = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, files: File[] = []) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -35,11 +40,31 @@ export const useAIChat = () => {
       throw new Error('You must be logged in to use Budget Bot');
     }
 
+    // Process files to base64
+    const processedFiles = await Promise.all(
+      files.map(async (file) => {
+        return new Promise<{name: string, type: string, content: string}>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64Content = reader.result as string;
+            resolve({
+              name: file.name,
+              type: file.type,
+              content: base64Content.split(',')[1] // Remove data:mime;base64, prefix
+            });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      })
+    );
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
       isUser: true,
       timestamp: new Date(),
+      files: processedFiles.length > 0 ? processedFiles : undefined,
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -47,12 +72,17 @@ export const useAIChat = () => {
 
     try {
       console.log('Sending message to AI chat function...');
-      console.log('Request data:', { message: content.substring(0, 100), threadId });
+      console.log('Request data:', { 
+        message: content.substring(0, 100), 
+        threadId,
+        filesCount: processedFiles.length 
+      });
       
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: { 
           message: content,
-          threadId: threadId
+          threadId: threadId,
+          files: processedFiles
         },
       });
 

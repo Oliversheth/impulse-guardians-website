@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Send, MessageCircle, Plus, History, Paperclip, X, Image, File } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,12 +31,14 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
     e.preventDefault();
     if ((!inputMessage.trim() && attachedFiles.length === 0) || isLoading) return;
 
-    const messageText = inputMessage.trim() || '[File attachment]';
+    const messageText = inputMessage.trim() || (attachedFiles.length > 0 ? '[File attachment]' : '');
+    const filesToSend = [...attachedFiles];
+    
     setInputMessage('');
     setAttachedFiles([]);
     
     try {
-      await sendMessage(messageText);
+      await sendMessage(messageText, filesToSend);
     } catch (error) {
       console.error('Failed to send message:', error);
     }
@@ -49,7 +50,15 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setAttachedFiles(prev => [...prev, ...files]);
+    const validFiles = files.filter(file => {
+      // Limit file size to 10MB
+      if (file.size > 10 * 1024 * 1024) {
+        console.warn(`File ${file.name} is too large (max 10MB)`);
+        return false;
+      }
+      return true;
+    });
+    setAttachedFiles(prev => [...prev, ...validFiles]);
   };
 
   const removeFile = (index: number) => {
@@ -142,6 +151,22 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
                 <div className="whitespace-pre-wrap break-words">
                   {message.content}
                 </div>
+                {message.files && message.files.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex flex-wrap gap-2">
+                      {message.files.map((file, index) => (
+                        <div key={index} className="flex items-center space-x-2 bg-gray-100 rounded px-2 py-1 text-xs">
+                          {file.type.startsWith('image/') ? (
+                            <Image className="h-3 w-3" />
+                          ) : (
+                            <File className="h-3 w-3" />
+                          )}
+                          <span className="truncate max-w-[100px]">{file.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <p className={`text-xs mt-2 ${
                   message.isUser ? 'text-cerulean-100' : 'text-gray-500'
                 }`}>
