@@ -15,7 +15,9 @@ serve(async (req) => {
   }
 
   try {
+    console.log('AI Chat function invoked');
     const { message, threadId } = await req.json()
+    console.log('Request data:', { message: message?.substring(0, 100), threadId });
     
     // Create Supabase client to verify user
     const supabaseClient = createClient(
@@ -25,22 +27,27 @@ serve(async (req) => {
     )
 
     // Verify user is authenticated
+    console.log('Verifying user authentication...');
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
     if (authError || !user) {
+      console.error('Authentication failed:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    console.log('User authenticated:', user.id);
 
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiApiKey) {
+      console.error('OpenAI API key not configured');
       return new Response(
         JSON.stringify({ error: 'OpenAI API key not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    console.log('OpenAI API key found');
 
     const headers = {
       'Authorization': `Bearer ${openaiApiKey}`,
@@ -53,86 +60,124 @@ serve(async (req) => {
     // Step 1: Create a thread if one doesn't exist
     if (!currentThreadId) {
       console.log('Creating new thread...');
-      const threadResponse = await fetch('https://api.openai.com/v1/threads', {
-        method: 'POST',
-        headers,
-      });
-      
-      if (!threadResponse.ok) {
-        const errorText = await threadResponse.text();
-        console.error('Failed to create thread:', errorText);
-        throw new Error(`Failed to create thread: ${threadResponse.status} ${errorText}`);
+      try {
+        const threadResponse = await fetch('https://api.openai.com/v1/threads', {
+          method: 'POST',
+          headers,
+        });
+        
+        if (!threadResponse.ok) {
+          const errorText = await threadResponse.text();
+          console.error('Failed to create thread:', threadResponse.status, errorText);
+          throw new Error(`Failed to create thread: ${threadResponse.status} ${errorText}`);
+        }
+        
+        const threadData = await threadResponse.json();
+        currentThreadId = threadData.id;
+        console.log('Created thread:', currentThreadId);
+      } catch (error) {
+        console.error('Thread creation error:', error);
+        throw new Error(`Thread creation failed: ${error.message}`);
       }
-      
-      const threadData = await threadResponse.json();
-      currentThreadId = threadData.id;
-      console.log('Created thread:', currentThreadId);
     }
 
     // Step 2: Add message to thread
     console.log('Adding message to thread...');
-    const messageResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        role: 'user',
-        content: message
-      })
-    });
+    try {
+      const messageResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          role: 'user',
+          content: message
+        })
+      });
 
-    if (!messageResponse.ok) {
-      const errorText = await messageResponse.text();
-      console.error('Failed to add message:', errorText);
-      throw new Error(`Failed to add message to thread: ${messageResponse.status} ${errorText}`);
+      if (!messageResponse.ok) {
+        const errorText = await messageResponse.text();
+        console.error('Failed to add message:', messageResponse.status, errorText);
+        throw new Error(`Failed to add message to thread: ${messageResponse.status} ${errorText}`);
+      }
+      console.log('Message added to thread successfully');
+    } catch (error) {
+      console.error('Message addition error:', error);
+      throw new Error(`Message addition failed: ${error.message}`);
     }
 
     // Step 3: Run the assistant
     console.log('Running assistant...');
-    const runResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        assistant_id: ASSISTANT_ID
-      })
-    });
+    let runId;
+    try {
+      const runResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          assistant_id: ASSISTANT_ID
+        })
+      });
 
-    if (!runResponse.ok) {
-      const errorText = await runResponse.text();
-      console.error('Failed to run assistant:', errorText);
-      throw new Error(`Failed to run assistant: ${runResponse.status} ${errorText}`);
+      if (!runResponse.ok) {
+        const errorText = await runResponse.text();
+        console.error('Failed to run assistant:', runResponse.status, errorText);
+        
+        // If assistant not found, try fallback to chat completions
+        if (runResponse.status === 404) {
+          console.log('Assistant not found, falling back to chat completions...');
+          return await fallbackToChatCompletions(message, openaiApiKey, user.id, supabaseClient, currentThreadId);
+        }
+        
+        throw new Error(`Failed to run assistant: ${runResponse.status} ${errorText}`);
+      }
+
+      const runData = await runResponse.json();
+      runId = runData.id;
+      console.log('Started run:', runId);
+    } catch (error) {
+      console.error('Assistant run error:', error);
+      
+      // Try fallback if assistant fails
+      if (error.message.includes('404') || error.message.includes('not found')) {
+        console.log('Falling back to chat completions due to assistant error...');
+        return await fallbackToChatCompletions(message, openaiApiKey, user.id, supabaseClient, currentThreadId);
+      }
+      
+      throw error;
     }
 
-    const runData = await runResponse.json();
-    const runId = runData.id;
-    console.log('Started run:', runId);
-
     // Step 4: Poll for completion
+    console.log('Polling for completion...');
     let runStatus = 'in_progress';
     let attempts = 0;
     const maxAttempts = 60; // 60 seconds max wait time
 
     while (runStatus === 'in_progress' || runStatus === 'queued') {
       if (attempts >= maxAttempts) {
+        console.error('Assistant response timeout after 60 seconds');
         throw new Error('Assistant response timeout after 60 seconds');
       }
 
       await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
       
-      const statusResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs/${runId}`, {
-        headers
-      });
-      
-      if (!statusResponse.ok) {
-        const errorText = await statusResponse.text();
-        console.error('Failed to check run status:', errorText);
-        throw new Error(`Failed to check run status: ${statusResponse.status} ${errorText}`);
+      try {
+        const statusResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs/${runId}`, {
+          headers
+        });
+        
+        if (!statusResponse.ok) {
+          const errorText = await statusResponse.text();
+          console.error('Failed to check run status:', statusResponse.status, errorText);
+          throw new Error(`Failed to check run status: ${statusResponse.status} ${errorText}`);
+        }
+        
+        const statusData = await statusResponse.json();
+        runStatus = statusData.status;
+        attempts++;
+        
+        console.log(`Run status: ${runStatus} (attempt ${attempts})`);
+      } catch (error) {
+        console.error('Status check error:', error);
+        throw error;
       }
-      
-      const statusData = await statusResponse.json();
-      runStatus = statusData.status;
-      attempts++;
-      
-      console.log(`Run status: ${runStatus} (attempt ${attempts})`);
     }
 
     if (runStatus === 'failed') {
@@ -147,43 +192,57 @@ serve(async (req) => {
 
     // Step 5: Get the assistant's response
     console.log('Fetching assistant response...');
-    const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
-      headers
-    });
+    let responseContent;
+    try {
+      const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
+        headers
+      });
 
-    if (!messagesResponse.ok) {
-      const errorText = await messagesResponse.text();
-      console.error('Failed to fetch messages:', errorText);
-      throw new Error(`Failed to fetch messages: ${messagesResponse.status} ${errorText}`);
+      if (!messagesResponse.ok) {
+        const errorText = await messagesResponse.text();
+        console.error('Failed to fetch messages:', messagesResponse.status, errorText);
+        throw new Error(`Failed to fetch messages: ${messagesResponse.status} ${errorText}`);
+      }
+
+      const messagesData = await messagesResponse.json();
+      const assistantMessages = messagesData.data.filter((msg: any) => msg.role === 'assistant');
+      
+      if (assistantMessages.length === 0) {
+        throw new Error('No assistant response found');
+      }
+
+      const latestResponse = assistantMessages[0];
+      responseContent = latestResponse.content[0]?.text?.value || 'Sorry, I could not generate a response.';
+      console.log('Successfully got assistant response');
+    } catch (error) {
+      console.error('Response fetch error:', error);
+      throw error;
     }
-
-    const messagesData = await messagesResponse.json();
-    const assistantMessages = messagesData.data.filter((msg: any) => msg.role === 'assistant');
-    
-    if (assistantMessages.length === 0) {
-      throw new Error('No assistant response found');
-    }
-
-    const latestResponse = assistantMessages[0];
-    const responseContent = latestResponse.content[0]?.text?.value || 'Sorry, I could not generate a response.';
-
-    console.log('Successfully got assistant response');
 
     // Store conversation in database
     try {
-      await supabaseClient
+      console.log('Storing conversation in database...');
+      const { error: dbError } = await supabaseClient
         .from('ai_conversations')
         .insert({
           user_id: user.id,
           message: message,
           response: responseContent,
           thread_id: currentThreadId
-        })
+        });
+      
+      if (dbError) {
+        console.error('Database storage error:', dbError);
+        // Don't fail the request if database storage fails, but log it
+      } else {
+        console.log('Conversation stored successfully');
+      }
     } catch (dbError) {
       console.error('Failed to store conversation in database:', dbError);
       // Don't fail the request if database storage fails
     }
 
+    console.log('AI Chat function completed successfully');
     return new Response(
       JSON.stringify({ 
         response: responseContent,
@@ -194,12 +253,83 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in ai-chat function:', error)
+    
+    // Return detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorDetails = error instanceof Error ? error.stack : 'No stack trace available';
+    
+    console.error('Error details:', { message: errorMessage, stack: errorDetails });
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Internal server error',
-        details: 'Please check the function logs for more information'
+        error: errorMessage,
+        details: 'Check the function logs for more information'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
   }
 })
+
+// Fallback function for when assistant API fails
+async function fallbackToChatCompletions(message: string, openaiApiKey: string, userId: string, supabaseClient: any, threadId: string | null) {
+  console.log('Using fallback chat completions API...');
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: "You are Budget Bot, a helpful AI financial education assistant. You help users learn about personal finance, budgeting, investing, and money management. Provide clear, educational responses about financial topics." 
+          },
+          { role: 'user', content: message }
+        ],
+        max_tokens: 1000,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Fallback API error:', response.status, errorText);
+      throw new Error(`Fallback API failed: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    const responseContent = data.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+
+    // Store conversation in database
+    try {
+      await supabaseClient
+        .from('ai_conversations')
+        .insert({
+          user_id: userId,
+          message: message,
+          response: responseContent,
+          thread_id: threadId
+        });
+    } catch (dbError) {
+      console.error('Failed to store fallback conversation:', dbError);
+    }
+
+    console.log('Fallback response generated successfully');
+    return new Response(
+      JSON.stringify({ 
+        response: responseContent,
+        threadId: threadId
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Fallback error:', error);
+    throw error;
+  }
+}

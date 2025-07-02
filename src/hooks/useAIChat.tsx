@@ -47,6 +47,8 @@ export const useAIChat = () => {
 
     try {
       console.log('Sending message to AI chat function...');
+      console.log('Request data:', { message: content.substring(0, 100), threadId });
+      
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: { 
           message: content,
@@ -54,13 +56,35 @@ export const useAIChat = () => {
         },
       });
 
+      console.log('Function response:', { data, error });
+
       if (error) {
         console.error('Supabase function error:', error);
-        throw new Error(error.message || 'Failed to get response from Budget Bot');
+        
+        // More specific error handling
+        let errorMessage = 'Failed to get response from Budget Bot';
+        
+        if (error.message?.includes('non-2xx')) {
+          errorMessage = 'Budget Bot service is temporarily unavailable. Please try again in a moment.';
+        } else if (error.message?.includes('timeout')) {
+          errorMessage = 'Request timed out. Please try again with a shorter message.';
+        } else if (error.message?.includes('rate limit')) {
+          errorMessage = 'Too many requests. Please wait a moment before trying again.';
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      if (!data || !data.response) {
+      if (!data) {
+        console.error('No data received from function');
         throw new Error('No response received from Budget Bot');
+      }
+
+      if (!data.response) {
+        console.error('No response content in data:', data);
+        throw new Error('Budget Bot returned an empty response');
       }
 
       // Update threadId if it's a new conversation
