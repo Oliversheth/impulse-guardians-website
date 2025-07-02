@@ -8,14 +8,21 @@ const Footer = () => {
 
   const handleSectionNavigation = (sectionId: string) => {
     if (location.pathname === '/') {
-      // On Index page, scroll to section (this would need to be handled by the parent)
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      // On Index page, update hash and let Index component handle section switching
+      if (sectionId === 'home') {
+        window.history.pushState(null, '', '/');
+      } else {
+        window.history.pushState(null, '', `#${sectionId}`);
       }
+      // Dispatch custom event to trigger section change
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
     } else {
       // On other pages, navigate to home with section
-      navigate(`/#${sectionId}`);
+      if (sectionId === 'home') {
+        navigate('/');
+      } else {
+        navigate(`/#${sectionId}`);
+      }
     }
   };
 

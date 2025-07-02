@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -6,41 +7,58 @@ import AuthDialog from '@/components/AuthDialog';
 
 interface LayoutProps {
   children: React.ReactNode;
+  activeSection?: string;
+  setActiveSection?: (section: string) => void;
 }
 
-const Layout = ({ children }: LayoutProps) => {
-  const [activeSection, setActiveSection] = useState('home');
+const Layout = ({ children, activeSection, setActiveSection }: LayoutProps) => {
+  const [localActiveSection, setLocalActiveSection] = useState('home');
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Use props if provided (for Index page), otherwise use local state
+  const currentActiveSection = activeSection || localActiveSection;
+  const handleSetActiveSection = setActiveSection || setLocalActiveSection;
 
   // Update active section based on current route
   useEffect(() => {
     const path = location.pathname;
     if (path === '/') {
-      // On home page, keep section-based navigation
-      return;
+      // On home page, check hash for section navigation
+      const hash = location.hash.replace('#', '');
+      if (hash && ['home', 'courses', 'ai-assistant', 'about'].includes(hash)) {
+        handleSetActiveSection(hash);
+      } else if (!activeSection) {
+        // Only set to home if no activeSection prop is provided
+        handleSetActiveSection('home');
+      }
     } else if (path.startsWith('/course/')) {
-      setActiveSection('courses');
+      handleSetActiveSection('courses');
     } else if (path === '/account') {
-      setActiveSection('home'); // or could be a separate account section
+      handleSetActiveSection('home');
     } else {
-      setActiveSection('home');
+      handleSetActiveSection('home');
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.hash, activeSection, handleSetActiveSection]);
 
-  const handleSetActiveSection = (section: string) => {
+  const handleNavigateToSection = (section: string) => {
     if (location.pathname === '/') {
       // On Index page, use section-based navigation
-      setActiveSection(section);
+      handleSetActiveSection(section);
+      
+      // Update URL hash for direct linking
+      if (section !== 'home') {
+        window.history.pushState(null, '', `#${section}`);
+      } else {
+        window.history.pushState(null, '', '/');
+      }
     } else {
       // On other pages, navigate to home with section
       if (section === 'home') {
         navigate('/');
       } else {
         navigate(`/#${section}`);
-        // After navigation, the Index component will handle section switching
-        setTimeout(() => setActiveSection(section), 100);
       }
     }
   };
@@ -48,8 +66,8 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen">
       <Header 
-        activeSection={activeSection} 
-        setActiveSection={handleSetActiveSection}
+        activeSection={currentActiveSection} 
+        setActiveSection={handleNavigateToSection}
         onAuthRequired={() => setIsAuthDialogOpen(true)}
       />
       <main>{children}</main>

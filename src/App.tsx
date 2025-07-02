@@ -23,18 +23,15 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/course/:courseId" element={<CourseDetail />} />
-              <Route path="/course/:courseId/lesson/:lessonId" element={<LessonView />} />
-              <Route path="/account" element={<AccountSettings />} />
-              <Route path="/legal-disclaimer" element={<LegalDisclaimer />} />
-              <Route path="/sample-budgets" element={<SampleBudgets />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/course/:courseId" element={<Layout><CourseDetail /></Layout>} />
+            <Route path="/course/:courseId/lesson/:lessonId" element={<Layout><LessonView /></Layout>} />
+            <Route path="/account" element={<Layout><AccountSettings /></Layout>} />
+            <Route path="/legal-disclaimer" element={<Layout><LegalDisclaimer /></Layout>} />
+            <Route path="/sample-budgets" element={<Layout><SampleBudgets /></Layout>} />
+            <Route path="*" element={<Layout><NotFound /></Layout>} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
