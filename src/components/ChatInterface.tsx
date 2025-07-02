@@ -16,7 +16,15 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { messages, sendMessage, isLoading } = useAIChat();
+  const { 
+    messages, 
+    sendMessage, 
+    isLoading, 
+    startNewConversation,
+    conversations,
+    loadConversations,
+    loadConversation
+  } = useAIChat();
   const { user } = useAuth();
 
   const scrollToBottom = () => {
@@ -26,6 +34,12 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (user && showConversationList) {
+      loadConversations();
+    }
+  }, [user, showConversationList]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +79,13 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const startNewConversation = () => {
+  const handleStartNewConversation = () => {
+    startNewConversation();
+    setShowConversationList(false);
+  };
+
+  const handleLoadConversation = (threadId: string) => {
+    loadConversation(threadId);
     setShowConversationList(false);
   };
 
@@ -84,7 +104,7 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={startNewConversation}
+              onClick={handleStartNewConversation}
               className="w-full bg-cerulean-600 hover:bg-cerulean-700 text-white flex items-center space-x-2"
             >
               <Plus className="h-4 w-4" />
@@ -96,9 +116,28 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
                 <History className="h-4 w-4" />
                 <span>Previous Conversations</span>
               </h3>
-              <p className="text-sm text-gray-400 text-center py-8">
-                No previous conversations yet. Start your first chat!
-              </p>
+              {conversations.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-8">
+                  No previous conversations yet. Start your first chat!
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {conversations.map((conversation) => (
+                    <div
+                      key={conversation.id}
+                      onClick={() => handleLoadConversation(conversation.thread_id)}
+                      className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    >
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {conversation.last_message}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(conversation.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

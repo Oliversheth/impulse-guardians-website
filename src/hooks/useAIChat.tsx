@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +17,14 @@ interface Message {
   }>;
 }
 
+interface Conversation {
+  id: string;
+  thread_id: string;
+  last_message: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useAIChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -27,8 +36,94 @@ export const useAIChat = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const loadConversations = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .select('id, thread_id, message, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading conversations:', error);
+        return;
+      }
+
+      // Group by thread_id and get the most recent message for each thread
+      const conversationMap = new Map();
+      data?.forEach(conv => {
+        if (!conversationMap.has(conv.thread_id) || 
+            new Date(conv.created_at) > new Date(conversationMap.get(conv.thread_id).created_at)) {
+          conversationMap.set(conv.thread_id, conv);
+        }
+      });
+
+      const conversationList = Array.from(conversationMap.values()).map(conv => ({
+        id: conv.id,
+        thread_id: conv.thread_id,
+        last_message: conv.message.substring(0, 100) + (conv.message.length > 100 ? '...' : ''),
+        created_at: conv.created_at,
+        updated_at: conv.created_at
+      }));
+
+      setConversations(conversationList);
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+    }
+  };
+
+  const loadConversation = async (selectedThreadId: string) => {
+    if (!user || !selectedThreadId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .select('message, response, created_at')
+        .eq('user_id', user.id)
+        .eq('thread_id', selectedThreadId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error loading conversation:', error);
+        return;
+      }
+
+      const loadedMessages: Message[] = [
+        {
+          id: '1',
+          content: "Hello! I'm Budget Bot, your AI financial education assistant. I'm here to help you learn about personal finance, budgeting, investing, and money management. What would you like to know?",
+          isUser: false,
+          timestamp: new Date(),
+        }
+      ];
+
+      data?.forEach((conv, index) => {
+        loadedMessages.push({
+          id: `user-${index}`,
+          content: conv.message,
+          isUser: true,
+          timestamp: new Date(conv.created_at),
+        });
+        loadedMessages.push({
+          id: `ai-${index}`,
+          content: conv.response,
+          isUser: false,
+          timestamp: new Date(conv.created_at),
+        });
+      });
+
+      setMessages(loadedMessages);
+      setThreadId(selectedThreadId);
+    } catch (error) {
+      console.error('Failed to load conversation:', error);
+    }
+  };
 
   const sendMessage = async (content: string, files: File[] = []) => {
     if (!user) {
@@ -132,6 +227,9 @@ export const useAIChat = () => {
 
       setMessages(prev => [...prev, aiMessage]);
       
+      // Reload conversations to update the list
+      await loadConversations();
+      
     } catch (error) {
       console.error('Error sending message:', error);
       
@@ -179,5 +277,9 @@ export const useAIChat = () => {
     isLoading,
     threadId,
     startNewConversation,
+    conversations,
+    loadConversations,
+    loadConversation,
   };
 };
+
