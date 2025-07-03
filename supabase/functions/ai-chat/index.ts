@@ -21,7 +21,7 @@ serve(async (req) => {
       filesCount: files.length 
     });
     
-    // Create Supabase client to verify user
+    // Create Supabase client to verify user and fetch course data
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -39,6 +39,29 @@ serve(async (req) => {
       )
     }
     console.log('User authenticated:', user.id);
+
+    // Fetch user's course progress and learning context
+    console.log('Fetching user course progress...');
+    const { data: courseProgress } = await supabaseClient
+      .from('course_progress')
+      .select('course_id, progress_percentage, completed_at, enrolled_at')
+      .eq('user_id', user.id);
+
+    const { data: lessonProgress } = await supabaseClient
+      .from('lesson_progress')
+      .select('course_id, lesson_id, quiz_passed, video_watched, completed_at')
+      .eq('user_id', user.id);
+
+    const { data: achievements } = await supabaseClient
+      .from('user_achievements')
+      .select('achievement_id, earned_at')
+      .eq('user_id', user.id);
+
+    console.log('Course progress data fetched:', { 
+      coursesEnrolled: courseProgress?.length || 0,
+      lessonsCompleted: lessonProgress?.filter(l => l.quiz_passed).length || 0,
+      achievementsEarned: achievements?.length || 0
+    });
 
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
@@ -95,11 +118,66 @@ serve(async (req) => {
     // Choose model based on whether we have images
     const model = hasImages ? 'gpt-4o' : 'gpt-4o-mini';
     console.log('Using model:', model);
+    // Build personalized context based on user's learning progress
+    let learningContext = '';
+    if (courseProgress && courseProgress.length > 0) {
+      const completedCourses = courseProgress.filter(c => c.completed_at).length;
+      const totalProgress = courseProgress.reduce((sum, c) => sum + (c.progress_percentage || 0), 0) / courseProgress.length;
+      
+      learningContext += `\n\nUser's Learning Context:
+- Enrolled in ${courseProgress.length} course(s)
+- Completed ${completedCourses} course(s)
+- Average progress: ${Math.round(totalProgress)}%`;
+
+      if (lessonProgress && lessonProgress.length > 0) {
+        const completedLessons = lessonProgress.filter(l => l.quiz_passed).length;
+        learningContext += `
+- Completed ${completedLessons} lesson(s)`;
+        
+        // Add recent learning activity
+        const recentLessons = lessonProgress
+          .filter(l => l.completed_at)
+          .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
+          .slice(0, 3);
+          
+        if (recentLessons.length > 0) {
+          learningContext += `
+- Recent lessons completed: Course ${recentLessons.map(l => `${l.course_id} Lesson ${l.lesson_id}`).join(', ')}`;
+        }
+      }
+
+      if (achievements && achievements.length > 0) {
+        learningContext += `
+- Earned ${achievements.length} achievement(s)`;
+      }
+    }
+
+    const systemPrompt = `You are Budget Bot, a helpful AI financial education assistant. You help users learn about personal finance, budgeting, investing, and money management. 
+
+IMPORTANT: You have access to this user's learning progress and should provide personalized, contextual responses based on their journey:
+${learningContext}
+
+When responding:
+1. Reference their completed courses/lessons when relevant
+2. Suggest next steps based on their current progress
+3. Build upon concepts they've already learned
+4. Recommend specific courses if they haven't started learning yet
+5. Celebrate their achievements and progress
+6. If they ask about topics they've already covered, provide advanced insights
+
+Available courses in the system:
+- Course 1: Budgeting Basics (Essential budgeting fundamentals)
+- Course 2: Emergency Fund Planning (Building financial security)
+- Course 3: Debt Management (Strategies for debt elimination)
+- Course 4: Investing 101 (Introduction to investing)
+- Course 5: Advanced Investing (Portfolio diversification and strategies)
+
+Provide clear, educational responses about financial topics. If images are provided, analyze them in the context of financial education.`;
     
     const messages = [
       { 
         role: 'system', 
-        content: "You are Budget Bot, a helpful AI financial education assistant. You help users learn about personal finance, budgeting, investing, and money management. Provide clear, educational responses about financial topics. If images are provided, analyze them in the context of financial education - this could include receipts, budgets, financial documents, charts, or any visual content related to money management." 
+        content: systemPrompt
       },
       { 
         role: 'user', 
