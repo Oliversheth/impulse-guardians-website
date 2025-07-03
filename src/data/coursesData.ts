@@ -57,7 +57,7 @@ export const coursesData: Course[] = [
         duration: "15 min",
         completed: false,
         quiz: {
-          passingScore: 70,
+          passingScore: 90,
           questions: [
             {
               id: 1,
@@ -141,7 +141,7 @@ export const coursesData: Course[] = [
         duration: "20 min",
         completed: false,
         quiz: {
-          passingScore: 70,
+          passingScore: 90,
           questions: [
             {
               id: 1,
@@ -241,7 +241,7 @@ export const coursesData: Course[] = [
         duration: "18 min",
         completed: false,
         quiz: {
-          passingScore: 70,
+          passingScore: 90,
           questions: [
             {
               id: 1,
@@ -341,7 +341,7 @@ export const coursesData: Course[] = [
         duration: "25 min",
         completed: false,
         quiz: {
-          passingScore: 70,
+          passingScore: 90,
           questions: [
             {
               id: 1,

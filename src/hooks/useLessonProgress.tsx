@@ -244,6 +244,34 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
     updateVideoProgress,
     updateVideoWatched,
     updateQuizPassed,
+    resetLessonProgress: async () => {
+      if (!user) return;
+
+      try {
+        if (progress) {
+          const { error } = await supabase
+            .from('lesson_progress')
+            .delete()
+            .eq('id', progress.id);
+
+          if (error) throw error;
+        }
+
+        setProgress(null);
+        
+        toast({
+          title: "Lesson Reset",
+          description: "Your progress has been reset. You can start over.",
+        });
+      } catch (error) {
+        console.error('Error resetting lesson progress:', error);
+        toast({
+          title: "Error",
+          description: "Failed to reset lesson progress.",
+          variant: "destructive",
+        });
+      }
+    },
     isVideoWatched: progress?.video_watched || false,
     isQuizPassed: progress?.quiz_passed || false,
     videoProgress: progress?.video_progress_percentage || 0,

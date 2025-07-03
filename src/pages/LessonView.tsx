@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, ArrowLeft, ArrowRight, Lock } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, Lock, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +27,8 @@ const LessonView = () => {
     loading, 
     updateVideoProgress,
     updateVideoWatched, 
-    updateQuizPassed, 
+    updateQuizPassed,
+    resetLessonProgress,
     isVideoWatched, 
     isQuizPassed,
     videoProgress,
@@ -183,7 +184,7 @@ const LessonView = () => {
                 <div className="text-center py-8">
                   <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
                   <h3 className="text-lg font-semibold text-green-700 mb-2">Quiz Completed!</h3>
-                  <p className="text-gray-600 mb-4">You've successfully completed this lesson with 70% or higher.</p>
+                  <p className="text-gray-600 mb-4">You've successfully completed this lesson with 90% or higher.</p>
                   {nextLesson ? (
                     <Button 
                       onClick={() => navigate(`/course/${courseId}/lesson/${nextLesson.id}`)}
@@ -206,7 +207,7 @@ const LessonView = () => {
                 <div className="text-center py-8">
                   <h3 className="text-lg font-semibold mb-4">Ready for the quiz?</h3>
                   <p className="text-gray-600 mb-4">
-                    Test your knowledge with a quiz. You need to score 70% or higher to complete this lesson.
+                    Test your knowledge with a quiz. You need to score 90% or higher to complete this lesson.
                   </p>
                   <Button 
                     onClick={() => setShowQuiz(true)}
@@ -281,7 +282,7 @@ const LessonView = () => {
             </CardContent>
           </Card>
 
-          {/* Navigation */}
+          {/* Navigation & Reset */}
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-3">
@@ -303,6 +304,23 @@ const LessonView = () => {
                   >
                     Next Lesson
                     <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+                
+                {/* Reset Lesson Progress */}
+                {(videoProgress > 0 || isQuizPassed) && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => {
+                      if (confirm('Are you sure you want to reset your progress for this lesson? This will clear your video progress and quiz completion.')) {
+                        resetLessonProgress();
+                        setShowQuiz(false);
+                      }
+                    }}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset Lesson
                   </Button>
                 )}
               </div>

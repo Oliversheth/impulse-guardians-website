@@ -26,8 +26,8 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
-  // Use 70% as the minimum passing score
-  const effectivePassingScore = Math.max(quiz.passingScore, 70);
+  // Use the quiz's passing score directly
+  const effectivePassingScore = quiz.passingScore;
 
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswers(prev => ({
@@ -128,13 +128,14 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
                       <strong>Your answer:</strong> {question.options[selectedAnswer]}
                     </div>
                     
-                    {!isCorrect && (
+                    {/* Only show correct answers and explanations if user passed */}
+                    {passed && !isCorrect && (
                       <div className="p-2 rounded bg-green-100">
                         <strong>Correct answer:</strong> {question.options[question.correctAnswer]}
                       </div>
                     )}
                     
-                    {question.explanation && (
+                    {passed && question.explanation && (
                       <div className="p-2 rounded bg-blue-50">
                         <strong>Explanation:</strong> {question.explanation}
                       </div>
