@@ -8,7 +8,6 @@ import { siteContent } from '@/data/siteContent';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ChatInterface from './ChatInterface';
-import CalculatorHub from './calculators/CalculatorHub';
 
 const iconMap = {
   Calculator, PiggyBank, TrendingUp, MessageCircle
@@ -132,13 +131,18 @@ const AIAssistant = () => {
                 >
                   View Sample Budgets
                 </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-cactus-600 text-cactus-600 hover:bg-cactus-50"
+                  onClick={() => navigate('/calculators')}
+                >
+                  Try Financial Calculators
+                </Button>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      <CalculatorHub />
       
       {showChatInterface && (
         <ChatInterface onClose={() => setShowChatInterface(false)} />

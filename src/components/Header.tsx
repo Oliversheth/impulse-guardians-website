@@ -28,6 +28,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     { id: 'home', label: 'Home' },
     { id: 'courses', label: 'Courses', requiresAuth: true },
     { id: 'ai-assistant', label: 'Budget Bot', requiresAuth: true },
+    { id: 'calculators', label: 'Calculators' },
     { id: 'about', label: 'About' },
   ];
 
@@ -39,6 +40,8 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
 
     if (sectionId === 'home') {
       navigate('/');
+    } else if (sectionId === 'calculators') {
+      navigate('/calculators');
     } else {
       navigate(`/#${sectionId}`);
     }
@@ -68,6 +71,9 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
     }
     // For non-Index pages, highlight based on route
     if (itemId === 'courses' && location.pathname.startsWith('/course')) {
+      return true;
+    }
+    if (itemId === 'calculators' && location.pathname === '/calculators') {
       return true;
     }
     return false;
