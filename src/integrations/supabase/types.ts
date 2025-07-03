@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          name: string
+          points: number
+          requirement_type: string
+          requirement_value: Json
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          icon: string
+          id?: string
+          name: string
+          points?: number
+          requirement_type: string
+          requirement_value: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          points?: number
+          requirement_type?: string
+          requirement_value?: Json
+        }
+        Relationships: []
+      }
       ai_conversations: {
         Row: {
           created_at: string
@@ -36,6 +72,90 @@ export type Database = {
         }
         Relationships: []
       }
+      bookmarks: {
+        Row: {
+          bookmark_type: string
+          course_id: number
+          created_at: string
+          id: string
+          lesson_id: number | null
+          user_id: string
+        }
+        Insert: {
+          bookmark_type?: string
+          course_id: number
+          created_at?: string
+          id?: string
+          lesson_id?: number | null
+          user_id: string
+        }
+        Update: {
+          bookmark_type?: string
+          course_id?: number
+          created_at?: string
+          id?: string
+          lesson_id?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calculator_usage: {
+        Row: {
+          calculator_type: string
+          created_at: string
+          id: string
+          input_data: Json
+          result_data: Json
+          user_id: string
+        }
+        Insert: {
+          calculator_type: string
+          created_at?: string
+          id?: string
+          input_data: Json
+          result_data: Json
+          user_id: string
+        }
+        Update: {
+          calculator_type?: string
+          created_at?: string
+          id?: string
+          input_data?: Json
+          result_data?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      course_notes: {
+        Row: {
+          course_id: number
+          created_at: string
+          id: string
+          lesson_id: number | null
+          note_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: number
+          created_at?: string
+          id?: string
+          lesson_id?: number | null
+          note_text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: number
+          created_at?: string
+          id?: string
+          lesson_id?: number | null
+          note_text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       course_progress: {
         Row: {
           completed_at: string | null
@@ -59,6 +179,48 @@ export type Database = {
           enrolled_at?: string
           id?: string
           progress_percentage?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_value: number | null
+          description: string | null
+          goal_type: string
+          id: string
+          target_date: string | null
+          target_value: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          goal_type: string
+          id?: string
+          target_date?: string | null
+          target_value?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          goal_type?: string
+          id?: string
+          target_date?: string | null
+          target_value?: number | null
+          title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -158,6 +320,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_agreements: {
         Row: {

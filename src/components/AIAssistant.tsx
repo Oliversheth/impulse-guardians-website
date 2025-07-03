@@ -8,6 +8,7 @@ import { siteContent } from '@/data/siteContent';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ChatInterface from './ChatInterface';
+import CalculatorHub from './calculators/CalculatorHub';
 
 const iconMap = {
   Calculator, PiggyBank, TrendingUp, MessageCircle
@@ -137,6 +138,8 @@ const AIAssistant = () => {
         </div>
       </section>
 
+      <CalculatorHub />
+      
       {showChatInterface && (
         <ChatInterface onClose={() => setShowChatInterface(false)} />
       )}

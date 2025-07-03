@@ -115,6 +115,12 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <Link to="/dashboard">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </DropdownMenuItem>
+                  </Link>
                   <Link to="/account">
                     <DropdownMenuItem className="cursor-pointer">
                       <Settings className="h-4 w-4 mr-2" />
