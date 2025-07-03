@@ -37,38 +37,24 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       return;
     }
 
-    if (location.pathname === '/') {
-      // On Index page, use section navigation
-      setActiveSection(sectionId);
+    if (sectionId === 'home') {
+      navigate('/');
     } else {
-      // On other pages, navigate to home with section
-      if (sectionId === 'home') {
-        navigate('/');
-      } else {
-        navigate(`/#${sectionId}`);
-      }
+      navigate(`/#${sectionId}`);
     }
     setIsMenuOpen(false);
   };
 
   const handleGetStartedClick = () => {
     if (isAuthenticated) {
-      if (location.pathname === '/') {
-        setActiveSection('courses');
-      } else {
-        navigate('/#courses');
-      }
+      navigate('/#courses');
     } else {
       onAuthRequired();
     }
   };
 
   const handleLogoClick = () => {
-    if (location.pathname === '/') {
-      setActiveSection('home');
-    } else {
-      navigate('/');
-    }
+    navigate('/');
   };
 
   const getUserDisplayName = () => {

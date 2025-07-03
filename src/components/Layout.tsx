@@ -43,23 +43,10 @@ const Layout = ({ children, activeSection, setActiveSection }: LayoutProps) => {
   }, [location.pathname, location.hash, activeSection, handleSetActiveSection]);
 
   const handleNavigateToSection = (section: string) => {
-    if (location.pathname === '/') {
-      // On Index page, use section-based navigation
-      handleSetActiveSection(section);
-      
-      // Update URL hash for direct linking
-      if (section !== 'home') {
-        window.history.pushState(null, '', `#${section}`);
-      } else {
-        window.history.pushState(null, '', '/');
-      }
+    if (section === 'home') {
+      navigate('/');
     } else {
-      // On other pages, navigate to home with section
-      if (section === 'home') {
-        navigate('/');
-      } else {
-        navigate(`/#${section}`);
-      }
+      navigate(`/#${section}`);
     }
   };
 

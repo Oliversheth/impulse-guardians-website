@@ -7,22 +7,10 @@ const Footer = () => {
   const location = useLocation();
 
   const handleSectionNavigation = (sectionId: string) => {
-    if (location.pathname === '/') {
-      // On Index page, update hash and let Index component handle section switching
-      if (sectionId === 'home') {
-        window.history.pushState(null, '', '/');
-      } else {
-        window.history.pushState(null, '', `#${sectionId}`);
-      }
-      // Dispatch custom event to trigger section change
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    if (sectionId === 'home') {
+      navigate('/');
     } else {
-      // On other pages, navigate to home with section
-      if (sectionId === 'home') {
-        navigate('/');
-      } else {
-        navigate(`/#${sectionId}`);
-      }
+      navigate(`/#${sectionId}`);
     }
   };
 

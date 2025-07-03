@@ -21,6 +21,21 @@ const Index = () => {
     }
   }, [location.hash]);
 
+  // Listen for hash changes (including from footer navigation)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && ['home', 'courses', 'ai-assistant', 'about'].includes(hash)) {
+        setActiveSection(hash);
+      } else {
+        setActiveSection('home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'home':
