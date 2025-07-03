@@ -45,54 +45,42 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
     if (!user) return;
 
     try {
-      let progressData = progress;
-      
-      if (!progressData) {
-        // Create new progress record
-        const { data, error } = await supabase
-          .from('lesson_progress')
-          .insert({
-            user_id: user.id,
-            course_id: courseId,
-            lesson_id: lessonId,
-            video_progress_percentage: Math.round(progressPercentage),
-            video_duration_watched: Math.round(currentTime),
-            video_watched: progressPercentage >= 90,
-            video_completed_at: progressPercentage >= 90 ? new Date().toISOString() : null,
-            quiz_passed: false
-          })
-          .select()
-          .single();
+      const updateData = {
+        user_id: user.id,
+        course_id: courseId,
+        lesson_id: lessonId,
+        video_progress_percentage: Math.round(progressPercentage),
+        video_duration_watched: Math.round(currentTime),
+        video_watched: progressPercentage >= 90,
+        video_completed_at: progressPercentage >= 90 ? new Date().toISOString() : null,
+        quiz_passed: false
+      };
 
-        if (error) throw error;
-        progressData = data;
-      } else {
-        // Update existing record
-        const updateData: any = {
-          video_progress_percentage: Math.round(progressPercentage),
-          video_duration_watched: Math.round(currentTime),
-          video_watched: progressPercentage >= 90
-        };
+      const { data, error } = await supabase
+        .from('lesson_progress')
+        .upsert(updateData, {
+          onConflict: 'user_id,course_id,lesson_id'
+        })
+        .select()
+        .single();
 
-        // Only set video_completed_at if it wasn't set before and we've reached 90%
-        if (progressPercentage >= 90 && !progressData.video_completed_at) {
-          updateData.video_completed_at = new Date().toISOString();
-        }
+      if (error) throw error;
+      setProgress(data);
 
-        const { data, error } = await supabase
-          .from('lesson_progress')
-          .update(updateData)
-          .eq('id', progressData.id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        progressData = data;
+      // Show toast only when reaching 90% for the first time
+      if (progressPercentage >= 90 && (!progress?.video_watched || progress?.video_progress_percentage < 90)) {
+        toast({
+          title: "Video Completed!",
+          description: "Quiz has been unlocked.",
+        });
       }
-
-      setProgress(progressData);
     } catch (error) {
       console.error('Error updating video progress:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save video progress.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -100,42 +88,26 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
     if (!user) return;
 
     try {
-      let progressData = progress;
-      
-      if (!progressData) {
-        const { data, error } = await supabase
-          .from('lesson_progress')
-          .insert({
-            user_id: user.id,
-            course_id: courseId,
-            lesson_id: lessonId,
-            video_watched: true,
-            video_progress_percentage: 100,
-            video_completed_at: new Date().toISOString(),
-            quiz_passed: false
-          })
-          .select()
-          .single();
+      const updateData = {
+        user_id: user.id,
+        course_id: courseId,
+        lesson_id: lessonId,
+        video_watched: true,
+        video_progress_percentage: 100,
+        video_completed_at: new Date().toISOString(),
+        quiz_passed: false
+      };
 
-        if (error) throw error;
-        progressData = data;
-      } else {
-        const { data, error } = await supabase
-          .from('lesson_progress')
-          .update({ 
-            video_watched: true,
-            video_progress_percentage: 100,
-            video_completed_at: new Date().toISOString()
-          })
-          .eq('id', progressData.id)
-          .select()
-          .single();
+      const { data, error } = await supabase
+        .from('lesson_progress')
+        .upsert(updateData, {
+          onConflict: 'user_id,course_id,lesson_id'
+        })
+        .select()
+        .single();
 
-        if (error) throw error;
-        progressData = data;
-      }
-
-      setProgress(progressData);
+      if (error) throw error;
+      setProgress(data);
       
       toast({
         title: "Video Completed!",

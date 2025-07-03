@@ -104,7 +104,7 @@ const LessonView = () => {
   const videoId = getYouTubeVideoId(videoUrl);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <div className="mb-6">
         <Button 
@@ -117,7 +117,7 @@ const LessonView = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Lesson Header */}
@@ -159,6 +159,32 @@ const LessonView = () => {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Lesson Content */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Lesson Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-cactus-700 mb-2">What You'll Learn</h4>
+                  <ul className="space-y-1 text-sm text-gray-600">
+                    <li>• Understanding the fundamentals covered in this lesson</li>
+                    <li>• Practical applications and real-world examples</li>
+                    <li>• Key concepts to master before moving forward</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-cactus-700 mb-2">Learning Objectives</h4>
+                  <p className="text-sm text-gray-600">
+                    By the end of this lesson, you'll have a solid understanding of the core concepts
+                    and be ready to apply them in practical scenarios.
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 

@@ -121,8 +121,8 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
           setCurrentProgress(progress);
           onProgressUpdate(progress, currentTime, duration);
 
-          // Auto-complete when reaching 90%
-          if (progress >= 90 && !isCompleted) {
+          // Auto-complete when reaching 90% (only call once)
+          if (progress >= 90 && !isCompleted && currentProgress < 90) {
             onVideoCompleted();
           }
         }
