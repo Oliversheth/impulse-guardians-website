@@ -29,7 +29,7 @@ const Dashboard = () => {
       enrolled_at: new Date().toISOString(), // Fallback for recent activity
       title: course.title
     };
-  }).filter(progress => progress.progress_percentage > 0); // Only show courses with progress
+  }); // Show all courses regardless of progress
 
   useEffect(() => {
     if (user) {
