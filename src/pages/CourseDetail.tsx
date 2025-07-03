@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, PlayCircle, CheckCircle, Clock, Users, Award, BookOpen, Lock } from 'lucide-react';
@@ -9,14 +8,20 @@ import { Progress } from '@/components/ui/progress';
 import { coursesData } from '@/data/coursesData';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegration';
+import { useDisclaimerAgreement } from '@/hooks/useDisclaimerAgreement';
 import { useAuth } from '@/contexts/AuthContext';
+import DisclaimerDialog from '@/components/DisclaimerDialog';
 
 const CourseDetail = () => {
   const { courseId } = useParams();
   const { isAuthenticated } = useAuth();
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  
   const course = coursesData.find(c => c.id === Number(courseId));
   const { progress, loading, enrollInCourse, isEnrolled } = useCourseProgress(Number(courseId) || 0);
   const integratedProgress = useCourseProgressIntegration(Number(courseId) || 0);
+  const { hasAgreed, loading: disclaimerLoading, recordAgreement } = useDisclaimerAgreement();
 
   if (!course) {
     return (
@@ -35,6 +40,34 @@ const CourseDetail = () => {
 
   const handleBackToCourses = () => {
     window.location.href = '/#courses';
+  };
+
+  const handleEnrollClick = () => {
+    if (!isAuthenticated) return;
+    
+    if (hasAgreed) {
+      // User has already agreed, proceed with enrollment
+      enrollInCourse();
+    } else {
+      // Show disclaimer dialog
+      setShowDisclaimer(true);
+    }
+  };
+
+  const handleDisclaimerAccept = async () => {
+    setIsEnrolling(true);
+    const success = await recordAgreement();
+    
+    if (success) {
+      // Agreement recorded, now enroll in course
+      await enrollInCourse();
+      setShowDisclaimer(false);
+    }
+    setIsEnrolling(false);
+  };
+
+  const handleDisclaimerCancel = () => {
+    setShowDisclaimer(false);
   };
 
   return (
@@ -99,11 +132,11 @@ const CourseDetail = () => {
                 </div>
               ) : !isEnrolled ? (
                 <Button 
-                  onClick={enrollInCourse}
+                  onClick={handleEnrollClick}
                   className="bg-cerulean-600 hover:bg-cerulean-700 text-white"
-                  disabled={loading}
+                  disabled={loading || disclaimerLoading}
                 >
-                  {loading ? 'Enrolling...' : 'Enroll in Course'}
+                  {loading || disclaimerLoading ? 'Loading...' : 'Enroll in Course'}
                 </Button>
               ) : (
                 <div className="text-center">
@@ -266,6 +299,14 @@ const CourseDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Disclaimer Dialog */}
+      <DisclaimerDialog
+        isOpen={showDisclaimer}
+        onAccept={handleDisclaimerAccept}
+        onCancel={handleDisclaimerCancel}
+        isLoading={isEnrolling}
+      />
     </div>
   );
 };
