@@ -162,32 +162,6 @@ const LessonView = () => {
             </CardContent>
           </Card>
 
-          {/* Lesson Content */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Lesson Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-cactus-700 mb-2">What You'll Learn</h4>
-                  <ul className="space-y-1 text-sm text-gray-600">
-                    <li>• Understanding the fundamentals covered in this lesson</li>
-                    <li>• Practical applications and real-world examples</li>
-                    <li>• Key concepts to master before moving forward</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-cactus-700 mb-2">Learning Objectives</h4>
-                  <p className="text-sm text-gray-600">
-                    By the end of this lesson, you'll have a solid understanding of the core concepts
-                    and be ready to apply them in practical scenarios.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Quiz Section */}
           <Card>
             <CardHeader>
@@ -254,6 +228,31 @@ const LessonView = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Lesson Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Lesson Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-cactus-700 mb-2">What You'll Learn</h4>
+                  <ul className="space-y-1 text-sm text-gray-600">
+                    <li>• Understanding the fundamentals covered in this lesson</li>
+                    <li>• Practical applications and real-world examples</li>
+                    <li>• Key concepts to master before moving forward</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-cactus-700 mb-2">Learning Objectives</h4>
+                  <p className="text-sm text-gray-600">
+                    By the end of this lesson, you'll have a solid understanding of the core concepts
+                    and be ready to apply them in practical scenarios.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           {/* Course Progress */}
           <Card>
             <CardHeader>
