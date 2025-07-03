@@ -8,7 +8,7 @@ import { Trophy, Target, BookOpen, Calculator, TrendingUp, Star, Plus } from 'lu
 import { useAuth } from '@/contexts/AuthContext';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useGoals } from '@/hooks/useGoals';
-import { useCourseProgress } from '@/hooks/useCourseProgress';
+import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegration';
 import { supabase } from '@/integrations/supabase/client';
 import { coursesData } from '@/data/coursesData';
 
@@ -16,9 +16,20 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { userAchievements, getTotalPoints, getAchievementsByCategory, loading: achievementsLoading } = useAchievements();
   const { goals, getActiveGoals, getCompletedGoals, getGoalProgress } = useGoals();
-  const [courseProgress, setCourseProgress] = useState<any[]>([]);
   const [calculatorUsage, setCalculatorUsage] = useState<any[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+
+  // Get integrated course progress for all courses
+  const courseProgressData = coursesData.map(course => {
+    const integration = useCourseProgressIntegration(course.id);
+    return {
+      course_id: course.id,
+      progress_percentage: integration.progressPercentage,
+      completed_at: integration.courseCompletedAt,
+      enrolled_at: new Date().toISOString(), // Fallback for recent activity
+      title: course.title
+    };
+  }).filter(progress => progress.progress_percentage > 0); // Only show courses with progress
 
   useEffect(() => {
     if (user) {
@@ -30,14 +41,6 @@ const Dashboard = () => {
     if (!user) return;
 
     try {
-      // Fetch course progress
-      const { data: progressData } = await supabase
-        .from('course_progress')
-        .select('*')
-        .eq('user_id', user.id);
-
-      setCourseProgress(progressData || []);
-
       // Fetch calculator usage
       const { data: calcData } = await supabase
         .from('calculator_usage')
@@ -48,11 +51,11 @@ const Dashboard = () => {
 
       setCalculatorUsage(calcData || []);
 
-      // Combine recent activity
+      // Combine recent activity using integrated course progress
       const activities = [
-        ...(progressData || []).map(p => ({
+        ...courseProgressData.map(p => ({
           type: 'course',
-          title: `Progress in ${coursesData.find(c => c.id === p.course_id)?.title}`,
+          title: `Progress in ${p.title}`,
           date: p.enrolled_at,
           progress: p.progress_percentage
         })),
@@ -71,7 +74,7 @@ const Dashboard = () => {
 
   const getFinancialHealthScore = () => {
     const factors = {
-      coursesCompleted: courseProgress.filter(p => p.completed_at).length * 20,
+      coursesCompleted: courseProgressData.filter(p => p.completed_at).length * 20,
       achievementsUnlocked: userAchievements.length * 5,
       goalsSet: goals.length * 10,
       goalsCompleted: getCompletedGoals().length * 15,
@@ -373,22 +376,19 @@ const Dashboard = () => {
                 <CardHeader>
                   <CardTitle>Course Progress</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {courseProgress.map((progress) => {
-                      const course = coursesData.find(c => c.id === progress.course_id);
-                      return (
-                        <div key={progress.id} className="space-y-2">
-                          <div className="flex justify-between">
-                            <span className="font-medium text-cactus-800">{course?.title}</span>
-                            <span className="text-sm text-cactus-600">{progress.progress_percentage}%</span>
-                          </div>
-                          <Progress value={progress.progress_percentage} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
+                 <CardContent>
+                   <div className="space-y-4">
+                     {courseProgressData.map((progress, index) => (
+                       <div key={`${progress.course_id}-${index}`} className="space-y-2">
+                         <div className="flex justify-between">
+                           <span className="font-medium text-cactus-800">{progress.title}</span>
+                           <span className="text-sm text-cactus-600">{progress.progress_percentage}%</span>
+                         </div>
+                         <Progress value={progress.progress_percentage} />
+                       </div>
+                     ))}
+                   </div>
+                 </CardContent>
               </Card>
 
               <Card>

@@ -124,7 +124,15 @@ const Courses = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
+            onClick={() => {
+              const coursesSection = document.getElementById('courses');
+              coursesSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
             View All Courses
           </Button>
         </div>
