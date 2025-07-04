@@ -130,10 +130,14 @@ const Dashboard = () => {
       return date;
     });
 
-    return last7Days.map(date => ({
+    // Fixed mock data to prevent chart from jumping around
+    const mockData = [2, 1, 3, 0, 2, 1, 2]; // lessons per day
+    const mockQuizData = [1, 0, 1, 0, 1, 1, 0]; // quizzes per day
+
+    return last7Days.map((date, index) => ({
       day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      lessons: Math.floor(Math.random() * 3), // Mock data - replace with actual lesson completion data
-      quizzes: Math.floor(Math.random() * 2),
+      lessons: mockData[index],
+      quizzes: mockQuizData[index],
       date: date.toISOString().split('T')[0]
     }));
   };
