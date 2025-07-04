@@ -27,6 +27,7 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'courses', label: 'Courses', requiresAuth: true },
+    { id: 'games', label: 'Games', requiresAuth: true },
     { id: 'ai-assistant', label: 'Budget Bot', requiresAuth: true },
     { id: 'calculators', label: 'Calculators' },
     { id: 'about', label: 'About' },
@@ -42,6 +43,8 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       navigate('/');
     } else if (sectionId === 'calculators') {
       navigate('/calculators');
+    } else if (sectionId === 'games') {
+      navigate('/budget-defense');
     } else {
       navigate(`/#${sectionId}`);
     }
@@ -74,6 +77,9 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
       return true;
     }
     if (itemId === 'calculators' && location.pathname === '/calculators') {
+      return true;
+    }
+    if (itemId === 'games' && location.pathname === '/budget-defense') {
       return true;
     }
     return false;
