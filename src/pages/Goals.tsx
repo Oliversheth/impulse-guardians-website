@@ -8,6 +8,7 @@ import { Plus, Search, Target, Calendar, TrendingUp, Award } from 'lucide-react'
 import { useGoals } from '@/hooks/useGoals';
 import { GoalProgressIndicator } from '@/components/GoalProgressIndicator';
 import { GoalNotificationPanel } from '@/components/GoalNotificationPanel';
+import CreateGoalDialog from '@/components/CreateGoalDialog';
 
 const Goals = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,10 +61,7 @@ const Goals = () => {
               Track your financial goals and celebrate your achievements
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Goal
-          </Button>
+          <CreateGoalDialog />
         </div>
 
         {/* Stats Cards */}
@@ -172,10 +170,12 @@ const Goals = () => {
                   Clear Search
                 </Button>
               ) : (
-                <Button className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Create Your First Goal
-                </Button>
+                <CreateGoalDialog trigger={
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create Your First Goal
+                  </Button>
+                } />
               )}
             </div>
           </CardContent>
