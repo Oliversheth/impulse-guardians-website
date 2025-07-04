@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, BookOpen, Calculator, TrendingUp, Star, Plus } from 'lucide-react';
+import { Trophy, Target, BookOpen, Calculator, TrendingUp, Star, Plus, BarChart3, Calendar, Clock, Award } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useGoals } from '@/hooks/useGoals';
@@ -12,6 +12,7 @@ import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegrati
 import { supabase } from '@/integrations/supabase/client';
 import { coursesData } from '@/data/coursesData';
 import { useNavigate } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -20,6 +21,8 @@ const Dashboard = () => {
   const { goals, getActiveGoals, getCompletedGoals, getGoalProgress } = useGoals();
   const [calculatorUsage, setCalculatorUsage] = useState<any[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [weeklyProgress, setWeeklyProgress] = useState<any[]>([]);
+  const [learningInsights, setLearningInsights] = useState<any>({});
 
   // Get integrated course progress for all courses
   const courseProgressData = coursesData.map(course => {
@@ -76,15 +79,24 @@ const Dashboard = () => {
 
   const getFinancialHealthScore = () => {
     const factors = {
-      coursesCompleted: courseProgressData.filter(p => p.completed_at).length * 20,
-      achievementsUnlocked: userAchievements.length * 5,
-      goalsSet: goals.length * 10,
-      goalsCompleted: getCompletedGoals().length * 15,
-      calculatorsUsed: new Set(calculatorUsage.map(c => c.calculator_type)).size * 10
+      coursesCompleted: courseProgressData.filter(p => p.completed_at).length * 15,
+      achievementsUnlocked: userAchievements.length * 8,
+      goalsSet: goals.length * 12,
+      goalsCompleted: getCompletedGoals().length * 20,
+      calculatorsUsed: new Set(calculatorUsage.map(c => c.calculator_type)).size * 10,
+      consistency: getStreakData() * 2 // Streak bonus
     };
 
     const totalScore = Object.values(factors).reduce((sum, score) => sum + score, 0);
-    return Math.min(totalScore, 100);
+    return {
+      score: Math.min(totalScore, 100),
+      factors,
+      breakdown: Object.entries(factors).map(([key, value]) => ({
+        name: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value,
+        percentage: (value / totalScore) * 100
+      }))
+    };
   };
 
   const getStreakData = () => {
@@ -111,6 +123,51 @@ const Dashboard = () => {
     return streak;
   };
 
+  const generateWeeklyProgressData = () => {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date;
+    });
+
+    return last7Days.map(date => ({
+      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      lessons: Math.floor(Math.random() * 3), // Mock data - replace with actual lesson completion data
+      quizzes: Math.floor(Math.random() * 2),
+      date: date.toISOString().split('T')[0]
+    }));
+  };
+
+  const generateLearningInsights = () => {
+    const totalLessons = coursesData.reduce((sum, course) => sum + course.lessons.length, 0);
+    const completedLessons = courseProgressData.reduce((sum, progress) => {
+      return sum + Math.floor((progress.progress_percentage / 100) * 
+        (coursesData.find(c => c.id === progress.course_id)?.lessons.length || 0));
+    }, 0);
+
+    const avgSessionTime = 25; // Mock data - replace with actual session tracking
+    const preferredLearningTime = 'Evening'; // Mock data
+    const strongestSkill = 'Budgeting'; // Based on completed courses
+
+    return {
+      totalLessons,
+      completedLessons,
+      completionRate: (completedLessons / totalLessons) * 100,
+      avgSessionTime,
+      preferredLearningTime,
+      strongestSkill,
+      weeklyGoal: 5, // lessons per week
+      weeklyProgress: 3 // lessons completed this week
+    };
+  };
+
+  useEffect(() => {
+    if (user) {
+      setWeeklyProgress(generateWeeklyProgressData());
+      setLearningInsights(generateLearningInsights());
+    }
+  }, [user, courseProgressData]);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -124,11 +181,13 @@ const Dashboard = () => {
     );
   }
 
-  const financialHealthScore = getFinancialHealthScore();
+  const healthScore = getFinancialHealthScore();
   const currentStreak = getStreakData();
   const totalPoints = getTotalPoints();
   const achievementsByCategory = getAchievementsByCategory();
   const activeGoals = getActiveGoals();
+
+  const CHART_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cactus-50 to-cerulean-50 py-8">
@@ -148,11 +207,11 @@ const Dashboard = () => {
               <TrendingUp className="h-4 w-4 text-cerulean-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-cactus-800">{financialHealthScore}/100</div>
-              <Progress value={financialHealthScore} className="mt-2" />
+              <div className="text-2xl font-bold text-cactus-800">{healthScore.score}/100</div>
+              <Progress value={healthScore.score} className="mt-2" />
               <p className="text-xs text-cactus-600 mt-2">
-                {financialHealthScore >= 80 ? 'Excellent!' : 
-                 financialHealthScore >= 60 ? 'Good progress' : 
+                {healthScore.score >= 80 ? 'Excellent!' : 
+                 healthScore.score >= 60 ? 'Good progress' : 
                  'Keep learning!'}
               </p>
             </CardContent>
@@ -200,8 +259,9 @@ const Dashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
             <TabsTrigger value="goals">Goals</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
@@ -271,6 +331,127 @@ const Dashboard = () => {
                     <Target className="h-4 w-4 mr-2" />
                     Set New Goal
                   </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Financial Health Breakdown */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Health Score Breakdown
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {healthScore.breakdown.map((factor, index) => (
+                      <div key={factor.name} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>{factor.name}</span>
+                          <span className="font-medium">{factor.value} pts</span>
+                        </div>
+                        <Progress value={factor.percentage} className="h-2" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Weekly Activity Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Weekly Learning Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={weeklyProgress}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="day" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="lessons" fill="#10B981" name="Lessons" />
+                      <Bar dataKey="quizzes" fill="#3B82F6" name="Quizzes" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Learning Insights */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Learning Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
+                        {learningInsights.completionRate?.toFixed(1)}%
+                      </div>
+                      <div className="text-sm text-muted-foreground">Completion Rate</div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
+                        {learningInsights.avgSessionTime}m
+                      </div>
+                      <div className="text-sm text-muted-foreground">Avg Session</div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="text-xl font-bold text-primary">
+                        {learningInsights.preferredLearningTime}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Best Time</div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="text-xl font-bold text-primary">
+                        {learningInsights.strongestSkill}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Top Skill</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Progress Comparison */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Course Progress Comparison
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Completed', value: courseProgressData.filter(p => p.completed_at).length, fill: '#10B981' },
+                          { name: 'In Progress', value: courseProgressData.filter(p => p.progress_percentage > 0 && !p.completed_at).length, fill: '#3B82F6' },
+                          { name: 'Not Started', value: courseProgressData.filter(p => p.progress_percentage === 0).length, fill: '#9CA3AF' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={80}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {courseProgressData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>

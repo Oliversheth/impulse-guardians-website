@@ -5,6 +5,9 @@ import { CheckCircle, ArrowLeft, ArrowRight, Lock, RotateCcw } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { useConfetti } from '@/hooks/useConfetti';
+import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { coursesData } from '@/data/coursesData';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegration';
@@ -18,6 +21,8 @@ const LessonView = () => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const { isActive: confettiActive, triggerConfetti } = useConfetti();
   const [showQuiz, setShowQuiz] = useState(false);
 
   const course = coursesData.find(c => c.id === parseInt(courseId || '0'));
@@ -82,11 +87,21 @@ const LessonView = () => {
 
   const handleVideoCompleted = () => {
     updateVideoWatched();
+    triggerConfetti();
+    toast({
+      title: "Lesson Completed! 🎉",
+      description: "Great job! You've finished watching this lesson.",
+    });
   };
 
   const handleQuizComplete = (passed: boolean, score: number) => {
     if (passed) {
       updateQuizPassed();
+      triggerConfetti();
+      toast({
+        title: "Quiz Passed! 🎉",
+        description: `Excellent work! You scored ${score}% on the quiz.`,
+      });
       // Navigate to next lesson if available and unlocked, otherwise back to course
       if (nextLesson && isNextLessonUnlocked) {
         navigate(`/course/${courseId}/lesson/${nextLesson.id}`);
@@ -369,6 +384,9 @@ const LessonView = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Confetti Celebration */}
+      <ConfettiCelebration isActive={confettiActive} />
     </div>
   );
 };

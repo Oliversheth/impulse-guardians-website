@@ -1,12 +1,15 @@
 
+import { useState } from 'react';
 import { BookOpen, Clock, Users, Award, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { coursesData } from '@/data/coursesData';
 import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegration';
 import { useAuth } from '@/contexts/AuthContext';
+import { CourseRecommendations } from '@/components/CourseRecommendations';
 import { Link } from 'react-router-dom';
 
 const CourseCard = ({ course }: { course: any }) => {
@@ -104,6 +107,13 @@ const CourseCard = ({ course }: { course: any }) => {
 };
 
 const Courses = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState(user ? "recommended" : "all");
+
+  const filterCoursesByLevel = (level: string) => {
+    return coursesData.filter(course => course.level === level);
+  };
+
   return (
     <section id="courses" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,25 +127,53 @@ const Courses = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {coursesData.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className={`grid w-full ${user ? 'grid-cols-4' : 'grid-cols-3'}`}>
+            {user && <TabsTrigger value="recommended">Recommended</TabsTrigger>}
+            <TabsTrigger value="all">All Courses</TabsTrigger>
+            <TabsTrigger value="Beginner">Beginner</TabsTrigger>
+            <TabsTrigger value="Intermediate">Intermediate</TabsTrigger>
+            <TabsTrigger value="Advanced">Advanced</TabsTrigger>
+          </TabsList>
 
-        <div className="text-center mt-12">
-          <Button 
-            variant="outline" 
-            size="lg" 
-            className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50"
-            onClick={() => {
-              const coursesSection = document.getElementById('courses');
-              coursesSection?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            View All Courses
-          </Button>
-        </div>
+          {user && (
+            <TabsContent value="recommended" className="mt-8">
+              <CourseRecommendations />
+            </TabsContent>
+          )}
+          
+          <TabsContent value="all" className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {coursesData.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="Beginner" className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filterCoursesByLevel('Beginner').map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="Intermediate" className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filterCoursesByLevel('Intermediate').map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="Advanced" className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filterCoursesByLevel('Advanced').map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </section>
   );
