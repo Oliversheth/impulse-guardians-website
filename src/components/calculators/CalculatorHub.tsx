@@ -184,6 +184,12 @@ const CalculatorHub = () => {
 
   return (
     <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-cactus-800 mb-4">Financial Calculators</h1>
+        <p className="text-xl text-cactus-600 max-w-3xl mx-auto">
+          Interactive tools to help you plan your financial future and make informed decisions
+        </p>
+      </div>
 
       <Tabs value={activeCalculator} onValueChange={setActiveCalculator}>
         <TabsList className="grid w-full grid-cols-5">
