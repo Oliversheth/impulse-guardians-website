@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
-import { useAchievements } from '@/hooks/useAchievements';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +12,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   loading: boolean;
+  getCurrentStreak: () => Promise<number>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { checkAndUnlockAchievement } = useAchievements();
 
   // Streak tracking functionality integrated directly
   const recordTodaysLogin = async (userId: string) => {
@@ -55,24 +54,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             user_id: userId,
             login_date: today
           });
-
-        // Calculate and check streak achievements
-        await calculateAndCheckStreak(userId);
       }
     } catch (error) {
       console.error('Error recording login:', error);
     }
   };
 
-  const calculateAndCheckStreak = async (userId: string) => {
+  const getCurrentStreak = async (): Promise<number> => {
+    if (!user) return 0;
+
     try {
       const { data: logins } = await (supabase as any)
         .from('user_login_streaks')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('login_date', { ascending: false });
 
-      if (!logins || logins.length === 0) return;
+      if (!logins || logins.length === 0) return 0;
 
       let streak = 0;
       const today = new Date();
@@ -92,15 +90,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       }
 
-      // Check for streak achievements
-      if (streak >= 3) {
-        await checkAndUnlockAchievement('streak', { streakDays: 3 });
-      }
-      if (streak >= 7) {
-        await checkAndUnlockAchievement('streak', { streakDays: 7 });
-      }
+      return streak;
     } catch (error) {
       console.error('Error calculating streak:', error);
+      return 0;
     }
   };
 
@@ -136,7 +129,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [toast, checkAndUnlockAchievement]);
+  }, [toast]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -263,7 +256,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         login,
         register,
         logout,
-        loading
+        loading,
+        getCurrentStreak
       }}
     >
       {children}

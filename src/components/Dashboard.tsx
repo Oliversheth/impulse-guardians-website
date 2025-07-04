@@ -15,14 +15,15 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, getCurrentStreak } = useAuth();
   const navigate = useNavigate();
-  const { userAchievements, getTotalPoints, getAchievementsByCategory, loading: achievementsLoading } = useAchievements();
+  const { userAchievements, getTotalPoints, getAchievementsByCategory, loading: achievementsLoading, checkAndUnlockAchievement } = useAchievements();
   const { goals, getActiveGoals, getCompletedGoals, getGoalProgress } = useGoals();
   const [calculatorUsage, setCalculatorUsage] = useState<any[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [weeklyProgress, setWeeklyProgress] = useState<any[]>([]);
   const [learningInsights, setLearningInsights] = useState<any>({});
+  const [loginStreak, setLoginStreak] = useState(0);
 
   // Get integrated course progress for all courses
   const courseProgressData = coursesData.map(course => {
@@ -39,8 +40,28 @@ const Dashboard = () => {
   useEffect(() => {
     if (user) {
       fetchDashboardData();
+      fetchStreakAndCheckAchievements();
     }
   }, [user]);
+
+  const fetchStreakAndCheckAchievements = async () => {
+    if (!user) return;
+
+    try {
+      const streak = await getCurrentStreak();
+      setLoginStreak(streak);
+      
+      // Check for streak achievements
+      if (streak >= 3) {
+        await checkAndUnlockAchievement('streak', { streakDays: 3 });
+      }
+      if (streak >= 7) {
+        await checkAndUnlockAchievement('streak', { streakDays: 7 });
+      }
+    } catch (error) {
+      console.error('Error fetching streak:', error);
+    }
+  };
 
   const fetchDashboardData = async () => {
     if (!user) return;
@@ -84,7 +105,7 @@ const Dashboard = () => {
       goalsSet: goals.length * 12,
       goalsCompleted: getCompletedGoals().length * 20,
       calculatorsUsed: new Set(calculatorUsage.map(c => c.calculator_type)).size * 10,
-      consistency: getStreakData() * 2 // Streak bonus
+      consistency: loginStreak * 2 // Real streak bonus
     };
 
     const totalScore = Object.values(factors).reduce((sum, score) => sum + score, 0);
@@ -227,9 +248,9 @@ const Dashboard = () => {
               <Star className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-cactus-800">{currentStreak} days</div>
+              <div className="text-2xl font-bold text-cactus-800">{loginStreak} days</div>
               <p className="text-xs text-cactus-600 mt-2">
-                {currentStreak > 0 ? '🔥 Keep it up!' : 'Start your streak today!'}
+                {loginStreak > 0 ? '🔥 Keep it up!' : 'Start your streak today!'}
               </p>
             </CardContent>
           </Card>
