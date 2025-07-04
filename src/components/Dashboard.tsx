@@ -11,9 +11,11 @@ import { useGoals } from '@/hooks/useGoals';
 import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegration';
 import { supabase } from '@/integrations/supabase/client';
 import { coursesData } from '@/data/coursesData';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { userAchievements, getTotalPoints, getAchievementsByCategory, loading: achievementsLoading } = useAchievements();
   const { goals, getActiveGoals, getCompletedGoals, getGoalProgress } = useGoals();
   const [calculatorUsage, setCalculatorUsage] = useState<any[]>([]);
@@ -248,7 +250,7 @@ const Dashboard = () => {
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"
-                    onClick={() => window.location.hash = 'courses'}
+                    onClick={() => navigate('/#courses')}
                   >
                     <BookOpen className="h-4 w-4 mr-2" />
                     Browse Courses
@@ -256,7 +258,7 @@ const Dashboard = () => {
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"
-                    onClick={() => window.location.hash = 'ai-assistant'}
+                    onClick={() => navigate('/calculators')}
                   >
                     <Calculator className="h-4 w-4 mr-2" />
                     Use Financial Calculators
@@ -264,6 +266,7 @@ const Dashboard = () => {
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"
+                    onClick={() => navigate('/goals')}
                   >
                     <Target className="h-4 w-4 mr-2" />
                     Set New Goal
@@ -332,7 +335,7 @@ const Dashboard = () => {
                     <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-cactus-800 mb-2">No active goals</h3>
                     <p className="text-cactus-600 mb-4">Set your first financial goal to get started!</p>
-                    <Button>
+                    <Button onClick={() => navigate('/goals')}>
                       <Plus className="h-4 w-4 mr-2" />
                       Create Goal
                     </Button>
