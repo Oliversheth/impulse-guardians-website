@@ -73,19 +73,23 @@ const EmergencyFundCalculator = () => {
           result_data: { targetAmount, needToSave, monthsToGoal }
         });
 
-        // Check for Savings Sage achievement
+        console.log('Checking emergency fund calculator achievement');
+        
+        // Check for Savings Sage achievement - individual calculator type
         await checkAndUnlockAchievement('calculator_use', {
           calculatorType: 'emergency_fund',
           count: 1
         });
         
-        // Check for Calculator Pro achievement (use 5 different calculators)
+        // Check for Calculator Pro achievement - count unique calculators
         const { data: calculatorUsage } = await supabase
           .from('calculator_usage')
           .select('calculator_type')
           .eq('user_id', user.id);
         
         const uniqueCalculators = new Set(calculatorUsage?.map(c => c.calculator_type) || []).size;
+        
+        console.log('Unique calculators used:', uniqueCalculators);
         
         await checkAndUnlockAchievement('calculator_use', {
           uniqueCalculators

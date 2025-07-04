@@ -111,6 +111,8 @@ export const useAchievements = () => {
   const checkRequirement = (achievement: Achievement, data: any): boolean => {
     const req = achievement.requirement_value;
 
+    console.log('Checking requirement:', achievement.name, 'Data:', data, 'Requirement:', req);
+
     switch (achievement.requirement_type) {
       case 'lesson_completion':
         return data.lessonCount >= req.count;
@@ -123,10 +125,15 @@ export const useAchievements = () => {
         }
         return data.quizScore >= req.min_score;
       case 'calculator_use':
+        // Handle individual calculator type achievements
         if (req.type) {
-          return data.calculatorType === req.type && data.count >= req.count;
+          return data.calculatorType === req.type && (data.count >= req.count || req.count === 1);
         }
-        return data.uniqueCalculators >= req.unique_types;
+        // Handle unique calculator counting achievements  
+        if (req.unique_types) {
+          return data.uniqueCalculators >= req.unique_types;
+        }
+        return false;
       case 'goal_creation':
         return data.goalCount >= req.count;
       case 'note_creation':

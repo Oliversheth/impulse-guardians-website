@@ -51,12 +51,17 @@ const Dashboard = () => {
       const streak = await getCurrentStreak();
       setLoginStreak(streak);
       
-      // Check for streak achievements
+      console.log('Current streak:', streak);
+      
+      // Check for streak achievements - pass the actual streak value
       if (streak >= 3) {
-        await checkAndUnlockAchievement('streak', { streakDays: 3 });
+        await checkAndUnlockAchievement('streak', { streakDays: streak });
       }
       if (streak >= 7) {
-        await checkAndUnlockAchievement('streak', { streakDays: 7 });
+        await checkAndUnlockAchievement('streak', { streakDays: streak });
+      }
+      if (streak >= 30) {
+        await checkAndUnlockAchievement('streak', { streakDays: streak });
       }
     } catch (error) {
       console.error('Error fetching streak:', error);

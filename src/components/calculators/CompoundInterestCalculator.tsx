@@ -72,19 +72,23 @@ const CompoundInterestCalculator = () => {
           result_data: { totalReturn: currentPrincipal, totalInterest: currentPrincipal - totalContributions }
         });
 
-        // Check for achievements
+        console.log('Checking compound interest calculator achievement');
+
+        // Check for Investment Insight achievement
         await checkAndUnlockAchievement('calculator_use', {
           calculatorType: 'compound_interest',
           count: 1
         });
         
-        // Check for Calculator Pro achievement (use 5 different calculators)
+        // Check for Calculator Pro achievement
         const { data: calculatorUsage } = await supabase
           .from('calculator_usage')
           .select('calculator_type')
           .eq('user_id', user.id);
         
         const uniqueCalculators = new Set(calculatorUsage?.map(c => c.calculator_type) || []).size;
+        
+        console.log('Unique calculators used:', uniqueCalculators);
         
         await checkAndUnlockAchievement('calculator_use', {
           uniqueCalculators
