@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
-import { useStreakTracking } from '@/hooks/useStreakTracking';
+import { useAchievements } from '@/hooks/useAchievements';
 
 interface AuthContextType {
   user: User | null;
@@ -34,9 +34,75 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
-  // Initialize streak tracking - this will automatically track login streaks
-  useStreakTracking();
+  const { checkAndUnlockAchievement } = useAchievements();
+
+  // Streak tracking functionality integrated directly
+  const recordTodaysLogin = async (userId: string) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+      const { data: existingLogin } = await (supabase as any)
+        .from('user_login_streaks')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('login_date', today)
+        .maybeSingle();
+
+      if (!existingLogin) {
+        await (supabase as any)
+          .from('user_login_streaks')
+          .insert({
+            user_id: userId,
+            login_date: today
+          });
+
+        // Calculate and check streak achievements
+        await calculateAndCheckStreak(userId);
+      }
+    } catch (error) {
+      console.error('Error recording login:', error);
+    }
+  };
+
+  const calculateAndCheckStreak = async (userId: string) => {
+    try {
+      const { data: logins } = await (supabase as any)
+        .from('user_login_streaks')
+        .select('*')
+        .eq('user_id', userId)
+        .order('login_date', { ascending: false });
+
+      if (!logins || logins.length === 0) return;
+
+      let streak = 0;
+      const today = new Date();
+      
+      for (let i = 0; i < logins.length; i++) {
+        const loginDate = new Date(logins[i].login_date + 'T00:00:00');
+        const expectedDate = new Date(today);
+        expectedDate.setDate(today.getDate() - i);
+        
+        const loginDateStr = loginDate.toISOString().split('T')[0];
+        const expectedDateStr = expectedDate.toISOString().split('T')[0];
+        
+        if (loginDateStr === expectedDateStr) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      // Check for streak achievements
+      if (streak >= 3) {
+        await checkAndUnlockAchievement('streak', { streakDays: 3 });
+      }
+      if (streak >= 7) {
+        await checkAndUnlockAchievement('streak', { streakDays: 7 });
+      }
+    } catch (error) {
+      console.error('Error calculating streak:', error);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener first
@@ -46,11 +112,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(session?.user ?? null);
       setLoading(false);
 
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' && session?.user) {
         toast({
           title: "Welcome!",
           description: "You have successfully signed in.",
         });
+        
+        // Record today's login for streak tracking
+        recordTodaysLogin(session.user.id);
       }
     });
 
@@ -59,10 +128,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // If user is already logged in, record today's login
+      if (session?.user) {
+        recordTodaysLogin(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, [toast, checkAndUnlockAchievement]);
 
   const login = async (email: string, password: string) => {
     try {
