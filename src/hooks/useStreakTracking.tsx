@@ -30,7 +30,7 @@ export const useStreakTracking = () => {
 
     try {
       // Check if we already recorded today's login
-      const { data: existingLogin } = await supabase
+      const { data: existingLogin } = await (supabase as any)
         .from('user_login_streaks')
         .select('*')
         .eq('user_id', user.id)
@@ -39,7 +39,7 @@ export const useStreakTracking = () => {
 
       if (!existingLogin) {
         // Record today's login
-        await supabase
+        await (supabase as any)
           .from('user_login_streaks')
           .insert({
             user_id: user.id,
@@ -55,11 +55,11 @@ export const useStreakTracking = () => {
     if (!user) return;
 
     try {
-      const { data: logins } = await supabase
+      const { data: logins } = await (supabase as any)
         .from('user_login_streaks')
         .select('*')
         .eq('user_id', user.id)
-        .order('login_date', { ascending: false });
+        .order('login_date', { ascending: false }) as { data: LoginStreak[] | null };
 
       if (!logins || logins.length === 0) {
         setCurrentStreak(0);
