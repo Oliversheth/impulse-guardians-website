@@ -16,6 +16,7 @@ import Calculators from "./pages/Calculators";
 import Dashboard from "./components/Dashboard";
 import Notes from "./pages/Notes";
 import Bookmarks from "./pages/Bookmarks";
+import Goals from "./pages/Goals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/calculators" element={<Layout><Calculators /></Layout>} />
             <Route path="/notes" element={<Layout><Notes /></Layout>} />
             <Route path="/bookmarks" element={<Layout><Bookmarks /></Layout>} />
+            <Route path="/goals" element={<Layout><Goals /></Layout>} />
             <Route path="/legal-disclaimer" element={<Layout><LegalDisclaimer /></Layout>} />
             <Route path="/sample-budgets" element={<Layout><SampleBudgets /></Layout>} />
             <Route path="*" element={<Layout><NotFound /></Layout>} />

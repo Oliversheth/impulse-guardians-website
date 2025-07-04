@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Menu, X, User, Settings, LogOut } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
@@ -137,6 +137,12 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                      <DropdownMenuItem className="cursor-pointer">
                        <Settings className="h-4 w-4 mr-2" />
                        My Bookmarks
+                     </DropdownMenuItem>
+                   </Link>
+                   <Link to="/goals">
+                     <DropdownMenuItem className="cursor-pointer">
+                       <Target className="h-4 w-4 mr-2" />
+                       My Goals
                      </DropdownMenuItem>
                    </Link>
                    <Link to="/account">
