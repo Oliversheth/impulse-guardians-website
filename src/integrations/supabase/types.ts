@@ -183,6 +183,78 @@ export type Database = {
         }
         Relationships: []
       }
+      game_achievements: {
+        Row: {
+          achievement_name: string
+          achievement_type: string
+          description: string | null
+          earned_at: string
+          game_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_name: string
+          achievement_type: string
+          description?: string | null
+          earned_at?: string
+          game_type?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_name?: string
+          achievement_type?: string
+          description?: string | null
+          earned_at?: string
+          game_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      game_scores: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          enemies_defeated: number
+          game_duration_seconds: number
+          game_type: string
+          id: string
+          money_earned: number
+          score: number
+          towers_placed: number
+          user_id: string
+          wave_reached: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          enemies_defeated?: number
+          game_duration_seconds?: number
+          game_type?: string
+          id?: string
+          money_earned?: number
+          score?: number
+          towers_placed?: number
+          user_id: string
+          wave_reached?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          enemies_defeated?: number
+          game_duration_seconds?: number
+          game_type?: string
+          id?: string
+          money_earned?: number
+          score?: number
+          towers_placed?: number
+          user_id?: string
+          wave_reached?: number
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           completed_at: string | null

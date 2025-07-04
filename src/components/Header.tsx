@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Menu, X, User, Settings, LogOut, Target } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Target, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
@@ -121,18 +121,24 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <Link to="/dashboard">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <User className="h-4 w-4 mr-2" />
-                      Dashboard
-                    </DropdownMenuItem>
-                  </Link>
-                   <Link to="/notes">
+                   <Link to="/dashboard">
                      <DropdownMenuItem className="cursor-pointer">
-                       <Settings className="h-4 w-4 mr-2" />
-                       My Notes
+                       <User className="h-4 w-4 mr-2" />
+                       Dashboard
                      </DropdownMenuItem>
                    </Link>
+                   <Link to="/budget-defense">
+                     <DropdownMenuItem className="cursor-pointer">
+                       <Shield className="h-4 w-4 mr-2" />
+                       Budget Defense
+                     </DropdownMenuItem>
+                   </Link>
+                    <Link to="/notes">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Settings className="h-4 w-4 mr-2" />
+                        My Notes
+                      </DropdownMenuItem>
+                    </Link>
                    <Link to="/bookmarks">
                      <DropdownMenuItem className="cursor-pointer">
                        <Settings className="h-4 w-4 mr-2" />
@@ -197,14 +203,24 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                 </button>
               ))}
               
-              {isAuthenticated ? (
-                <div className="flex flex-col space-y-2">
-                  <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
-                  <Link to="/account">
-                    <Button variant="outline" className="w-fit">
-                      Account Settings
-                    </Button>
-                  </Link>
+               {isAuthenticated ? (
+                 <div className="flex flex-col space-y-2">
+                   <span className="text-sm text-cactus-600">Welcome, {getUserDisplayName()}</span>
+                   <Link to="/dashboard">
+                     <Button variant="outline" className="w-fit">
+                       Dashboard
+                     </Button>
+                   </Link>
+                   <Link to="/budget-defense">
+                     <Button variant="outline" className="w-fit">
+                       Budget Defense
+                     </Button>
+                   </Link>
+                   <Link to="/account">
+                     <Button variant="outline" className="w-fit">
+                       Account Settings
+                     </Button>
+                   </Link>
                   <Button 
                     variant="outline"
                     onClick={logout}
