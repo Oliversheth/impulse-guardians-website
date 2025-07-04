@@ -7,20 +7,27 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { QuizQuestion } from '@/data/coursesData';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAchievements } from '@/hooks/useAchievements';
+import { supabase } from '@/integrations/supabase/client';
 
 interface QuizComponentProps {
   quiz: {
     questions: QuizQuestion[];
     passingScore: number;
   };
+  courseId: number;
+  lessonId: number;
   onComplete: (passed: boolean, score: number) => void;
 }
 
-const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
+const QuizComponent = ({ quiz, courseId, lessonId, onComplete }: QuizComponentProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
   const [showResults, setShowResults] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const { user } = useAuth();
+  const { checkAndUnlockAchievement } = useAchievements();
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
@@ -72,9 +79,46 @@ const QuizComponent = ({ quiz, onComplete }: QuizComponentProps) => {
     setQuizCompleted(false);
   };
 
-  const handleFinishQuiz = () => {
+  const handleFinishQuiz = async () => {
     const score = calculateScore();
     const passed = score >= effectivePassingScore;
+    
+    // Save quiz attempt and check achievements
+    if (user) {
+      try {
+        await supabase.from('quiz_attempts').insert({
+          user_id: user.id,
+          course_id: courseId,
+          lesson_id: lessonId,
+          score,
+          passed
+        });
+
+        // Check for Perfect Score achievement
+        if (score === 100) {
+          await checkAndUnlockAchievement('quiz_score', { quizScore: score, quizCount: 1 });
+        }
+
+        // Check for Quiz Master achievement (passing 5 quizzes with 80% or higher)
+        if (passed && score >= 80) {
+          const { data: passedQuizzes } = await supabase
+            .from('quiz_attempts')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('passed', true)
+            .gte('score', 80);
+          
+          const passedCount = (passedQuizzes?.length || 0);
+          await checkAndUnlockAchievement('quiz_score', { 
+            quizScore: 80, 
+            quizCount: passedCount 
+          });
+        }
+      } catch (error) {
+        console.error('Error saving quiz attempt:', error);
+      }
+    }
+    
     onComplete(passed, score);
   };
 

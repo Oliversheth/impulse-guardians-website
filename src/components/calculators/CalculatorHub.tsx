@@ -3,6 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, Wallet, CreditCard, PiggyBank, Calculator } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAchievements } from '@/hooks/useAchievements';
+import { supabase } from '@/integrations/supabase/client';
 import CompoundInterestCalculator from './CompoundInterestCalculator';
 import BudgetPlannerCalculator from './BudgetPlannerCalculator';
 import DebtPayoffCalculator from './DebtPayoffCalculator';
@@ -47,6 +50,8 @@ const EmergencyFundCalculator = () => {
   const [currentSavings, setCurrentSavings] = useState('1000');
   const [monthsGoal, setMonthsGoal] = useState('6');
   const [monthlySavings, setMonthlySavings] = useState('300');
+  const { user } = useAuth();
+  const { checkAndUnlockAchievement } = useAchievements();
 
   const expenses = parseFloat(monthlyExpenses) || 0;
   const current = parseFloat(currentSavings) || 0;
@@ -56,6 +61,28 @@ const EmergencyFundCalculator = () => {
   const targetAmount = expenses * months;
   const needToSave = Math.max(targetAmount - current, 0);
   const monthsToGoal = savings > 0 ? Math.ceil(needToSave / savings) : 0;
+
+  const handleCalculate = async () => {
+    // Save calculator usage and check for achievements
+    if (user) {
+      try {
+        await supabase.from('calculator_usage').insert({
+          user_id: user.id,
+          calculator_type: 'emergency_fund',
+          input_data: { monthlyExpenses, currentSavings, monthsGoal, monthlySavings },
+          result_data: { targetAmount, needToSave, monthsToGoal }
+        });
+
+        // Check for Savings Sage achievement
+        await checkAndUnlockAchievement('calculator_use', {
+          calculatorType: 'emergency_fund',
+          count: 1
+        });
+      } catch (error) {
+        console.error('Error saving calculator usage:', error);
+      }
+    }
+  };
 
   return (
     <Card>
@@ -117,6 +144,11 @@ const EmergencyFundCalculator = () => {
             />
           </div>
         </div>
+
+        <Button onClick={handleCalculate} className="w-full">
+          <PiggyBank className="h-4 w-4 mr-2" />
+          Calculate Emergency Fund
+        </Button>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>

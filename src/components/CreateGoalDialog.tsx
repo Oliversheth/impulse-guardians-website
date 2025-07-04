@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGoals } from '@/hooks/useGoals';
 import { useToast } from '@/hooks/use-toast';
+import { useAchievements } from '@/hooks/useAchievements';
 import { Plus } from 'lucide-react';
 
 interface CreateGoalDialogProps {
@@ -19,6 +20,7 @@ const CreateGoalDialog = ({ trigger, onGoalCreated }: CreateGoalDialogProps) => 
   const [loading, setLoading] = useState(false);
   const { createGoal } = useGoals();
   const { toast } = useToast();
+  const { checkAndUnlockAchievement } = useAchievements();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -48,6 +50,9 @@ const CreateGoalDialog = ({ trigger, onGoalCreated }: CreateGoalDialogProps) => 
         title: "Goal Created",
         description: "Your financial goal has been created successfully!",
       });
+
+      // Check for Goal Getter achievement
+      await checkAndUnlockAchievement('goal_creation', { goalCount: 1 });
 
       setFormData({
         title: '',

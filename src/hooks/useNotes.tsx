@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useAchievements } from '@/hooks/useAchievements';
 
 export interface Note {
   id: string;
@@ -18,6 +19,7 @@ export const useNotes = (courseId?: number, lessonId?: number) => {
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { checkAndUnlockAchievement } = useAchievements();
 
   // Fetch notes
   const fetchNotes = async () => {
@@ -97,6 +99,10 @@ export const useNotes = (courseId?: number, lessonId?: number) => {
         if (error) throw error;
         
         setNotes(prev => [data, ...prev]);
+        
+        // Check for Note Taker achievement on first note
+        await checkAndUnlockAchievement('note_creation', { noteCount: 1 });
+        
         return data;
       }
     } catch (error) {

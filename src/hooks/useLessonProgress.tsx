@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useAchievements } from '@/hooks/useAchievements';
 import { coursesData } from '@/data/coursesData';
 
 export const useLessonProgress = (courseId: number, lessonId: number) => {
@@ -10,6 +11,7 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { checkAndUnlockAchievement } = useAchievements();
 
   useEffect(() => {
     if (!user) {
@@ -165,6 +167,18 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
       
       await updateCourseProgress();
       
+      // Check for First Steps achievement (first lesson completion)
+      const { data: allUserLessons } = await supabase
+        .from('lesson_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('quiz_passed', true);
+      
+      const completedLessonsCount = allUserLessons?.length || 0;
+      if (completedLessonsCount === 1) {
+        await checkAndUnlockAchievement('lesson_completion', { lessonCount: 1 });
+      }
+      
       toast({
         title: "Lesson Completed!",
         description: "Your progress has been saved.",
@@ -227,6 +241,28 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
       }
 
       console.log('Course progress updated successfully:', courseData);
+
+      // Check for course completion achievements
+      if (progressPercentage >= 100) {
+        // Get total completed courses for achievements
+        const { data: completedCourses } = await supabase
+          .from('course_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('progress_percentage', 100);
+        
+        const courseCount = completedCourses?.length || 0;
+        
+        // Course Champion - complete first course
+        if (courseCount === 1) {
+          await checkAndUnlockAchievement('course_completion', { courseCount: 1 });
+        }
+        
+        // Course Collector - complete 3 courses
+        if (courseCount >= 3) {
+          await checkAndUnlockAchievement('course_completion', { courseCount: 3 });
+        }
+      }
 
     } catch (error) {
       console.error('Error updating course progress:', error);

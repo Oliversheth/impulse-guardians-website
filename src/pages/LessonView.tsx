@@ -250,6 +250,8 @@ const LessonView = () => {
               ) : (
                 <QuizComponent
                   quiz={lesson.quiz}
+                  courseId={parseInt(courseId || '0')}
+                  lessonId={parseInt(lessonId || '0')}
                   onComplete={handleQuizComplete}
                 />
               )}

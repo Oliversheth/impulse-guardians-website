@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useAchievements } from '@/hooks/useAchievements';
 
 export interface Bookmark {
   id: string;
@@ -16,6 +17,7 @@ export const useBookmarks = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { checkAndUnlockAchievement } = useAchievements();
 
   // Fetch bookmarks
   const fetchBookmarks = async () => {
@@ -88,6 +90,10 @@ export const useBookmarks = () => {
         if (error) throw error;
         
         setBookmarks(prev => [data, ...prev]);
+        
+        // Check for Bookmark Master achievement
+        const newBookmarkCount = bookmarks.length + 1;
+        await checkAndUnlockAchievement('bookmark_creation', { bookmarkCount: newBookmarkCount });
         
         toast({
           title: "Bookmark added",
