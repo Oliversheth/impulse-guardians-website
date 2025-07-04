@@ -128,7 +128,7 @@ const Courses = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${user ? 'grid-cols-4' : 'grid-cols-3'}`}>
+          <TabsList className={`grid w-full ${user ? 'grid-cols-5' : 'grid-cols-4'}`}>
             {user && <TabsTrigger value="recommended">Recommended</TabsTrigger>}
             <TabsTrigger value="all">All Courses</TabsTrigger>
             <TabsTrigger value="Beginner">Beginner</TabsTrigger>
