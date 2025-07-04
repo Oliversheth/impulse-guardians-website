@@ -127,12 +127,24 @@ const Header = ({ activeSection, setActiveSection, onAuthRequired }: HeaderProps
                       Dashboard
                     </DropdownMenuItem>
                   </Link>
-                  <Link to="/account">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Account Settings
-                    </DropdownMenuItem>
-                  </Link>
+                   <Link to="/notes">
+                     <DropdownMenuItem className="cursor-pointer">
+                       <Settings className="h-4 w-4 mr-2" />
+                       My Notes
+                     </DropdownMenuItem>
+                   </Link>
+                   <Link to="/bookmarks">
+                     <DropdownMenuItem className="cursor-pointer">
+                       <Settings className="h-4 w-4 mr-2" />
+                       My Bookmarks
+                     </DropdownMenuItem>
+                   </Link>
+                   <Link to="/account">
+                     <DropdownMenuItem className="cursor-pointer">
+                       <Settings className="h-4 w-4 mr-2" />
+                       Account Settings
+                     </DropdownMenuItem>
+                   </Link>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="cursor-pointer">
                     <LogOut className="h-4 w-4 mr-2" />

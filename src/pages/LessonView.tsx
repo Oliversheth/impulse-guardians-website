@@ -11,6 +11,8 @@ import { useCourseProgressIntegration } from '@/hooks/useCourseProgressIntegrati
 import { useAuth } from '@/contexts/AuthContext';
 import QuizComponent from '@/components/QuizComponent';
 import YouTubePlayer from '@/components/YouTubePlayer';
+import { NotesSection } from '@/components/NotesSection';
+import { BookmarkButton } from '@/components/BookmarkButton';
 
 const LessonView = () => {
   const { courseId, lessonId } = useParams();
@@ -124,15 +126,22 @@ const LessonView = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="bg-cerulean-100 text-cerulean-700">
-                  Lesson {lesson.id}
-                </Badge>
-                {isQuizPassed && (
-                  <Badge className="bg-green-100 text-green-700">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Completed
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-cerulean-100 text-cerulean-700">
+                    Lesson {lesson.id}
                   </Badge>
-                )}
+                  {isQuizPassed && (
+                    <Badge className="bg-green-100 text-green-700">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Completed
+                    </Badge>
+                  )}
+                </div>
+                <BookmarkButton 
+                  courseId={parseInt(courseId || '0')} 
+                  lessonId={parseInt(lessonId || '0')}
+                  type="lesson"
+                />
               </div>
               <CardTitle className="text-2xl text-cactus-800">{lesson.title}</CardTitle>
             </CardHeader>
@@ -161,6 +170,13 @@ const LessonView = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Notes Section */}
+          <NotesSection 
+            courseId={parseInt(courseId || '0')}
+            lessonId={parseInt(lessonId || '0')}
+            lessonTitle={lesson.title}
+          />
 
           {/* Quiz Section */}
           <Card>
