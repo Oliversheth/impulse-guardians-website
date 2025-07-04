@@ -33,7 +33,7 @@ export const useCourseRecommendations = () => {
     }
 
     generateRecommendations();
-  }, [user, JSON.stringify(courseProgressData)]);
+  }, [user, courseProgressData.map(p => `${p.courseId}-${p.progressPercentage}-${p.completed}`).join('|')]);
 
   const generateRecommendations = () => {
     const completedCourses = courseProgressData.filter(p => p.completed);

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Download, DollarSign, PiggyBank, ShoppingCart, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import Footer from '@/components/Footer';
+
 
 const SampleBudgets = () => {
   const navigate = useNavigate();
@@ -203,8 +203,6 @@ const SampleBudgets = () => {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 };
