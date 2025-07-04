@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { coursesData } from '@/data/coursesData';
 
 export const useLessonProgress = (courseId: number, lessonId: number) => {
   const [progress, setProgress] = useState<any>(null);
@@ -191,7 +192,8 @@ export const useLessonProgress = (courseId: number, lessonId: number) => {
       if (lessonsError) throw lessonsError;
 
       const completedLessons = allLessons?.filter(lesson => lesson.quiz_passed)?.length || 0;
-      const totalLessons = 2;
+      const course = coursesData.find(c => c.id === courseId);
+      const totalLessons = course?.lessons.length || 0;
       const progressPercentage = Math.round((completedLessons / totalLessons) * 100);
 
       const { error: courseError } = await supabase
