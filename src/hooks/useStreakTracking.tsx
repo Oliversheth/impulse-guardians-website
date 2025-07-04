@@ -90,10 +90,10 @@ export const useStreakTracking = () => {
       
       // Check for streak achievements
       if (streak >= 3) {
-        await checkAndUnlockAchievement('daily_login', { streakDays: 3 });
+        await checkAndUnlockAchievement('streak', { streakDays: 3 });
       }
       if (streak >= 7) {
-        await checkAndUnlockAchievement('daily_login', { streakDays: 7 });
+        await checkAndUnlockAchievement('streak', { streakDays: 7 });
       }
       
     } catch (error) {

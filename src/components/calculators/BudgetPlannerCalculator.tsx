@@ -90,6 +90,18 @@ const BudgetPlannerCalculator = () => {
           calculatorType: 'budget_planner',
           count: 1
         });
+        
+        // Check for Calculator Pro achievement (use 5 different calculators)
+        const { data: calculatorUsage } = await supabase
+          .from('calculator_usage')
+          .select('calculator_type')
+          .eq('user_id', user.id);
+        
+        const uniqueCalculators = new Set(calculatorUsage?.map(c => c.calculator_type) || []).size;
+        
+        await checkAndUnlockAchievement('calculator_use', {
+          uniqueCalculators
+        });
       } catch (error) {
         console.error('Error saving calculator usage:', error);
       }

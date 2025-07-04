@@ -110,8 +110,8 @@ const QuizComponent = ({ quiz, courseId, lessonId, onComplete }: QuizComponentPr
           
           const passedCount = (passedQuizzes?.length || 0);
           await checkAndUnlockAchievement('quiz_score', { 
-            quizScore: 80, 
-            quizCount: passedCount 
+            quizCount: passedCount,
+            minScore: 80
           });
         }
       } catch (error) {

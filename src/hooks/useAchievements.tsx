@@ -117,7 +117,11 @@ export const useAchievements = () => {
       case 'course_completion':
         return data.courseCount >= req.count;
       case 'quiz_score':
-        return data.quizScore >= req.min_score && data.quizCount >= req.count;
+        // Handle both individual quiz scores and cumulative quiz count
+        if (req.min_score && req.count > 1) {
+          return data.quizCount >= req.count && data.minScore >= req.min_score;
+        }
+        return data.quizScore >= req.min_score;
       case 'calculator_use':
         if (req.type) {
           return data.calculatorType === req.type && data.count >= req.count;
@@ -129,6 +133,8 @@ export const useAchievements = () => {
         return data.noteCount >= req.count;
       case 'bookmark_creation':
         return data.bookmarkCount >= req.count;
+      case 'streak':
+        return data.streakDays >= req.days;
       default:
         return false;
     }

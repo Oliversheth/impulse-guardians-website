@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
+import { useStreakTracking } from '@/hooks/useStreakTracking';
 
 interface AuthContextType {
   user: User | null;
@@ -33,6 +34,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  
+  // Initialize streak tracking - this will automatically track login streaks
+  useStreakTracking();
 
   useEffect(() => {
     // Set up auth state listener first
