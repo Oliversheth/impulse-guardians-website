@@ -37,9 +37,10 @@ const Hero = ({ setActiveSection }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 z-0">
+      {/* Hyperspeed Animation - Temporarily Disabled */}
+      {/* <div className="absolute inset-0 z-0">
         <Hyperspeed effectOptions={hyperspeedPresets.cyberpunk} />
-      </div>
+      </div> */}
       <div className="absolute inset-0 z-5 bg-gradient-to-br from-cerulean-50/90 to-cactus-50/90"></div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full animate-fade-in" style={{ animationDelay: '0.5s' }}>
         {/* Hero Content */}
