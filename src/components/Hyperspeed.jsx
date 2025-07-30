@@ -1131,5 +1131,6 @@ const Hyperspeed = ({ effectOptions = {
   return (
     <div id="lights" ref={hyperspeed}></div>
   );
+};
 
 export default Hyperspeed;
