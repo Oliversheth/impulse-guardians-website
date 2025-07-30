@@ -1129,7 +1129,7 @@ const Hyperspeed = ({ effectOptions = {
   }, [effectOptions]);
 
   return (
-    <div id="lights" ref={hyperspeed}></div>
+    <div id="lights" ref={hyperspeed} className="absolute inset-0 w-full h-full"></div>
   );
 };
 

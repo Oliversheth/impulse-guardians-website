@@ -26,14 +26,14 @@ export const hyperspeedPresets = {
     carShiftX: [-0.5, 0.5],
     carFloorSeparation: [0, 3],
     colors: {
-      roadColor: 0x061e26,         // deep blue
-      islandColor: 0x0a1f2d,       // dark cerulean
-      background: 0x000000,
-      shoulderLines: 0xffffff,     // white
+      roadColor: 0x2dd4bf,         // bright teal
+      islandColor: 0x06b6d4,       // sky blue
+      background: 0x0f172a,        // dark slate
+      shoulderLines: 0x22d3ee,     // cyan
       brokenLines: 0x00cfff,       // bright cerulean
-      leftCars: [0x00bcd4, 0x00acc1, 0x80deea],   // cerulean shades
-      rightCars: [0x4dd0e1, 0x26c6da, 0x00b8d4],
-      sticks: 0xffffff,            // white neon
+      leftCars: [0x06b6d4, 0x0891b2, 0x0e7490],   // sky blue shades
+      rightCars: [0x22d3ee, 0x0891b2, 0x155e75],  // cyan shades
+      sticks: 0x67e8f9,            // bright cyan
     }
   }
 };
