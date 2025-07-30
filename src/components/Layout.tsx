@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
-import { HyperspeedBackground } from '@/components/ui/hyperspeed-background';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -52,25 +51,18 @@ const Layout = ({ children, activeSection, setActiveSection }: LayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen relative">
-      {/* Hyperspeed background for home page */}
-      {location.pathname === '/' && (
-        <HyperspeedBackground className="fixed inset-0 pointer-events-none z-0" />
-      )}
-      
-      <div className="relative z-10">
-        <Header 
-          activeSection={currentActiveSection} 
-          setActiveSection={handleNavigateToSection}
-          onAuthRequired={() => setIsAuthDialogOpen(true)}
-        />
-        <main>{children}</main>
-        <Footer />
-        <AuthDialog 
-          isOpen={isAuthDialogOpen} 
-          onClose={() => setIsAuthDialogOpen(false)} 
-        />
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Header 
+        activeSection={currentActiveSection} 
+        setActiveSection={handleNavigateToSection}
+        onAuthRequired={() => setIsAuthDialogOpen(true)}
+      />
+      <main className="flex-1">{children}</main>
+      <Footer />
+      <AuthDialog 
+        isOpen={isAuthDialogOpen} 
+        onClose={() => setIsAuthDialogOpen(false)} 
+      />
     </div>
   );
 };

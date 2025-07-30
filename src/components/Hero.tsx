@@ -7,6 +7,8 @@ import { SplitText } from '@/components/ui/split-text';
 import { CountingNumber } from '@/components/ui/counting-number';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 import { HoverCardEnhanced } from '@/components/ui/hover-card-enhanced';
+import Hyperspeed from './Hyperspeed';
+import { hyperspeedPresets } from './HyperspeedPresets';
 
 interface HeroProps {
   setActiveSection?: (section: string) => void;
@@ -34,7 +36,8 @@ const Hero = ({ setActiveSection }: HeroProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-cerulean-50 to-cactus-50">      
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <Hyperspeed effectOptions={hyperspeedPresets.cyberpunk} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full animate-fade-in" style={{ animationDelay: '0.5s' }}>
         {/* Hero Content */}
         <div className="text-center animate-fade-in mb-12">
