@@ -3,6 +3,11 @@ import { useState, useEffect } from 'react';
 import { ArrowRight, BookOpen, Bot, Target, Users, Award, Shield, TrendingUp, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { siteContent } from '@/data/siteContent';
+import { SplitText } from '@/components/ui/split-text';
+import { CountingNumber } from '@/components/ui/counting-number';
+import { RippleButton } from '@/components/ui/ripple-button';
+import { FloatingParticles } from '@/components/ui/floating-particles';
+import { HoverCardEnhanced } from '@/components/ui/hover-card-enhanced';
 
 interface HeroProps {
   setActiveSection?: (section: string) => void;
@@ -30,46 +35,74 @@ const Hero = ({ setActiveSection }: HeroProps) => {
   };
 
   return (
-    <section className="bg-gradient-to-br from-cerulean-50 to-cactus-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <section className="relative bg-gradient-to-br from-cerulean-50 to-cactus-50 py-8 overflow-hidden">
+      {/* Floating particles background */}
+      <FloatingParticles 
+        particleCount={40} 
+        particleColors={['#0095db', '#00527a', '#b3e5ff', '#80d4ff']}
+        speed={0.3}
+        particleSize={3}
+        className="opacity-30"
+      />
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* Hero Content */}
         <div className="text-center animate-fade-in mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-cactus-800 mb-4">
-            {siteContent.hero.title.split(' ').slice(0, 2).join(' ')}
-            <span className="text-cerulean-600"> {siteContent.hero.title.split(' ').slice(2).join(' ')}</span>
+            <SplitText 
+              text={siteContent.hero.title.split(' ').slice(0, 2).join(' ')}
+              splitType="words"
+              delay={200}
+              duration={0.8}
+            />
+            <span className="text-cerulean-600">
+              <SplitText 
+                text={` ${siteContent.hero.title.split(' ').slice(2).join(' ')}`}
+                splitType="words"
+                delay={300}
+                duration={0.8}
+              />
+            </span>
           </h1>
           <p className="text-lg md:text-xl text-cactus-600 mb-6 max-w-3xl mx-auto">
             {siteContent.hero.description}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-            <Button 
+            <RippleButton 
               size="lg" 
-              className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
+              className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg animate-float"
               onClick={() => setActiveSection?.('courses')}
+              rippleColor="rgba(255, 255, 255, 0.4)"
             >
               Start Learning
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button 
+            </RippleButton>
+            <RippleButton 
               variant="outline" 
               size="lg" 
-              className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg"
+              className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg animate-float"
               onClick={() => setActiveSection?.('ai-assistant')}
+              rippleColor="rgba(0, 149, 219, 0.3)"
+              style={{ animationDelay: '0.5s' }}
             >
               Try Budget Bot
               <Bot className="ml-2 h-5 w-5" />
-            </Button>
+            </RippleButton>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-cerulean-600 mb-2">{studentsHelped.toLocaleString()}+</div>
+              <div className="text-3xl font-bold text-cerulean-600 mb-2">
+                <CountingNumber value={studentsHelped} duration={2500} format={(val) => `${val.toLocaleString()}+`} />
+              </div>
               <div className="text-cactus-600">Students Helped</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-cerulean-600 mb-2">{siteContent.hero.stats.interactiveCourses}</div>
+              <div className="text-3xl font-bold text-cerulean-600 mb-2">
+                <CountingNumber value={parseInt(siteContent.hero.stats.interactiveCourses)} duration={2000} />
+              </div>
               <div className="text-cactus-600">Interactive Courses</div>
             </div>
             <div className="text-center">
@@ -92,13 +125,13 @@ const Hero = ({ setActiveSection }: HeroProps) => {
             {siteContent.features.items.map((feature, index) => {
               const IconComponent = iconMap[feature.icon as keyof typeof iconMap];
               return (
-                <div key={index} className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="bg-cerulean-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                <HoverCardEnhanced key={index} glowColor="rgba(0, 149, 219, 0.2)">
+                  <div className="bg-cerulean-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4 animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
                     <IconComponent className="h-6 w-6 text-cerulean-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-cactus-800 mb-2">{feature.title}</h3>
                   <p className="text-cactus-600">{feature.description}</p>
-                </div>
+                </HoverCardEnhanced>
               );
             })}
           </div>
@@ -144,23 +177,29 @@ const Hero = ({ setActiveSection }: HeroProps) => {
         </div>
 
         {/* Call to Action */}
-        <div className="bg-white rounded-lg p-8 text-center shadow-lg">
+        <HoverCardEnhanced className="text-center" glowColor="rgba(0, 149, 219, 0.3)">
           <h2 className="text-2xl md:text-3xl font-bold text-cactus-800 mb-4">
-            Ready to Take Control of Your Finances?
+            <SplitText 
+              text="Ready to Take Control of Your Finances?"
+              splitType="words"
+              delay={150}
+              duration={0.6}
+            />
           </h2>
           <p className="text-cactus-600 mb-6 max-w-2xl mx-auto">
             Join thousands of students who have already transformed their financial future with NoImpulse. 
             Start your journey today – it's completely free!
           </p>
-          <Button 
+          <RippleButton 
             size="lg" 
-            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
+            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg animate-glow"
             onClick={() => setActiveSection?.('courses')}
+            rippleColor="rgba(255, 255, 255, 0.4)"
           >
             Get Started Free
             <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
+          </RippleButton>
+        </HoverCardEnhanced>
       </div>
     </section>
   );
