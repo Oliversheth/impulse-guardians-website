@@ -37,29 +37,7 @@ const Hero = ({ setActiveSection }: HeroProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-cerulean-50 to-cactus-50">
-      {/* Multi-Layer Animated Background */}
-      <DynamicMeshGradient 
-        className="opacity-60"
-        speed={0.4}
-        nodeCount={8}
-      />
-      <AnimatedWaveBackground 
-        className="opacity-40"
-        speed={0.02}
-        amplitude={80}
-      />
-      <FloatingGeometry 
-        count={18}
-        speed={0.6}
-        maxSize={45}
-        className="opacity-80"
-      />
-      
-      {/* Additional animated overlay for more coverage */}
-      <div className="absolute inset-0 bg-gradient-to-r from-cerulean-100/30 via-transparent to-cactus-100/30 animate-pulse" style={{ animationDuration: '4s' }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-cerulean-200/20 to-transparent animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
-      
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-cerulean-50 to-cactus-50">      
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full animate-fade-in" style={{ animationDelay: '0.5s' }}>
         {/* Hero Content */}
         <div className="text-center animate-fade-in mb-12">
