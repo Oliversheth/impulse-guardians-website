@@ -365,11 +365,9 @@ const Hyperspeed = ({ effectOptions = {
           0.1,
           10000
         );
-        // Position camera to look down from above for top-to-bottom effect
-        this.camera.position.z = 0;
-        this.camera.position.y = 200;
+        this.camera.position.z = -5;
+        this.camera.position.y = 8;
         this.camera.position.x = 0;
-        this.camera.rotation.x = -Math.PI / 2; // Look straight down
         this.scene = new THREE.Scene();
         this.scene.background = null;
 
