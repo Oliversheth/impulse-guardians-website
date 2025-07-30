@@ -5,11 +5,8 @@ import { Button } from '@/components/ui/button';
 import { siteContent } from '@/data/siteContent';
 import { SplitText } from '@/components/ui/split-text';
 import { CountingNumber } from '@/components/ui/counting-number';
-import { RippleButton } from '@/components/ui/ripple-button';
+import { MagneticButton } from '@/components/ui/magnetic-button';
 import { HoverCardEnhanced } from '@/components/ui/hover-card-enhanced';
-import { AnimatedWaveBackground } from '@/components/ui/animated-wave-background';
-import { FloatingGeometry } from '@/components/ui/floating-geometry';
-import { DynamicMeshGradient } from '@/components/ui/dynamic-mesh-gradient';
 
 interface HeroProps {
   setActiveSection?: (section: string) => void;
@@ -62,25 +59,25 @@ const Hero = ({ setActiveSection }: HeroProps) => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-            <RippleButton 
+            <MagneticButton 
+              variant="default" 
               size="lg" 
-              className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg group"
+              className="bg-gradient-to-r from-primary to-secondary text-white font-semibold px-8 py-4 text-lg min-w-[200px]"
               onClick={() => setActiveSection?.('courses')}
-              rippleColor="rgba(255, 255, 255, 0.4)"
             >
+              <BookOpen className="mr-2" />
               Start Learning
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-            </RippleButton>
-            <RippleButton 
+            </MagneticButton>
+            
+            <MagneticButton 
               variant="outline" 
               size="lg" 
-              className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg group"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold px-8 py-4 text-lg min-w-[200px]"
               onClick={() => setActiveSection?.('ai-assistant')}
-              rippleColor="rgba(0, 149, 219, 0.3)"
             >
+              <Bot className="mr-2" />
               Try Budget Bot
-              <Bot className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
-            </RippleButton>
+            </MagneticButton>
           </div>
 
           {/* Stats */}
@@ -182,15 +179,15 @@ const Hero = ({ setActiveSection }: HeroProps) => {
             Join thousands of students who have already transformed their financial future with NoImpulse. 
             Start your journey today – it's completely free!
           </p>
-          <RippleButton 
+          <MagneticButton 
+            variant="default" 
             size="lg" 
-            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg group"
+            className="bg-gradient-to-r from-primary to-secondary text-white font-semibold px-8 py-4 text-lg min-w-[200px]"
             onClick={() => setActiveSection?.('courses')}
-            rippleColor="rgba(255, 255, 255, 0.4)"
           >
+            <BookOpen className="mr-2" />
             Get Started Free
-            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-          </RippleButton>
+          </MagneticButton>
         </HoverCardEnhanced>
       </div>
     </section>

@@ -4,9 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
-import { SubtleMeshBackground } from '@/components/ui/subtle-mesh-background';
-import { GentleWaveBackground } from '@/components/ui/gentle-wave-background';
-import { FloatingParticlesSubtle } from '@/components/ui/floating-particles-subtle';
+import { HyperspeedBackground } from '@/components/ui/hyperspeed-background';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -55,13 +53,9 @@ const Layout = ({ children, activeSection, setActiveSection }: LayoutProps) => {
 
   return (
     <div className="min-h-screen relative">
-      {/* Full-page animated background - only show on home page */}
+      {/* Hyperspeed background for home page */}
       {location.pathname === '/' && (
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <SubtleMeshBackground speed={0.2} nodeCount={4} />
-          <GentleWaveBackground speed={0.015} amplitude={40} />
-          <FloatingParticlesSubtle count={8} speed={0.3} />
-        </div>
+        <HyperspeedBackground className="fixed inset-0 pointer-events-none z-0" />
       )}
       
       <div className="relative z-10">
