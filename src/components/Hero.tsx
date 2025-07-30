@@ -8,6 +8,7 @@ import { CountingNumber } from '@/components/ui/counting-number';
 import { RippleButton } from '@/components/ui/ripple-button';
 import { FloatingParticles } from '@/components/ui/floating-particles';
 import { HoverCardEnhanced } from '@/components/ui/hover-card-enhanced';
+import { AnimatedGradientBackground } from '@/components/ui/animated-gradient-background';
 
 interface HeroProps {
   setActiveSection?: (section: string) => void;
@@ -36,13 +37,20 @@ const Hero = ({ setActiveSection }: HeroProps) => {
 
   return (
     <section className="relative bg-gradient-to-br from-cerulean-50 to-cactus-50 py-8 overflow-hidden">
+      {/* Animated gradient background */}
+      <AnimatedGradientBackground 
+        colors={['#e0f4ff', '#b3e5ff', '#80d4ff', '#f7f7f6']}
+        speed={0.015}
+        className="opacity-60"
+      />
+      
       {/* Floating particles background */}
       <FloatingParticles 
-        particleCount={40} 
+        particleCount={60} 
         particleColors={['#0095db', '#00527a', '#b3e5ff', '#80d4ff']}
-        speed={0.3}
-        particleSize={3}
-        className="opacity-30"
+        speed={0.4}
+        particleSize={4}
+        className="opacity-40"
       />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -71,23 +79,22 @@ const Hero = ({ setActiveSection }: HeroProps) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <RippleButton 
               size="lg" 
-              className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg animate-float"
+              className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg group"
               onClick={() => setActiveSection?.('courses')}
               rippleColor="rgba(255, 255, 255, 0.4)"
             >
               Start Learning
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
             </RippleButton>
             <RippleButton 
               variant="outline" 
               size="lg" 
-              className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg animate-float"
+              className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg group"
               onClick={() => setActiveSection?.('ai-assistant')}
               rippleColor="rgba(0, 149, 219, 0.3)"
-              style={{ animationDelay: '0.5s' }}
             >
               Try Budget Bot
-              <Bot className="ml-2 h-5 w-5" />
+              <Bot className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
             </RippleButton>
           </div>
 
@@ -126,7 +133,7 @@ const Hero = ({ setActiveSection }: HeroProps) => {
               const IconComponent = iconMap[feature.icon as keyof typeof iconMap];
               return (
                 <HoverCardEnhanced key={index} glowColor="rgba(0, 149, 219, 0.2)">
-                  <div className="bg-cerulean-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4 animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
+                  <div className="bg-cerulean-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:animate-pulse">
                     <IconComponent className="h-6 w-6 text-cerulean-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-cactus-800 mb-2">{feature.title}</h3>
@@ -192,12 +199,12 @@ const Hero = ({ setActiveSection }: HeroProps) => {
           </p>
           <RippleButton 
             size="lg" 
-            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg animate-glow"
+            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg group"
             onClick={() => setActiveSection?.('courses')}
             rippleColor="rgba(255, 255, 255, 0.4)"
           >
             Get Started Free
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
           </RippleButton>
         </HoverCardEnhanced>
       </div>

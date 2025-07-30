@@ -9,6 +9,7 @@ interface RippleButtonProps extends ButtonProps {
 export const RippleButton = React.forwardRef<HTMLButtonElement, RippleButtonProps>(
   ({ className, rippleColor = 'rgba(255, 255, 255, 0.6)', children, onClick, ...props }, ref) => {
     const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
+    const [isHovered, setIsHovered] = useState(false);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       const button = event.currentTarget;
@@ -35,8 +36,14 @@ export const RippleButton = React.forwardRef<HTMLButtonElement, RippleButtonProp
     return (
       <Button
         ref={ref}
-        className={cn('relative overflow-hidden', className)}
+        className={cn(
+          'relative overflow-hidden transition-all duration-300',
+          isHovered ? 'animate-pulse' : '',
+          className
+        )}
         onClick={handleClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
         {children}

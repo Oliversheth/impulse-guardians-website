@@ -145,6 +145,14 @@ export default {
 					'50%': {
 						boxShadow: '0 0 40px rgba(0, 149, 219, 0.6)'
 					}
+				},
+				'pulse-slow': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.8'
+					}
 				}
 			},
 			animation: {
@@ -153,7 +161,8 @@ export default {
 				'fade-in': 'fade-in 0.6s ease-out',
 				'ripple': 'ripple 0.6s ease-out',
 				'float': 'float 3s ease-in-out infinite',
-				'glow': 'glow 2s ease-in-out infinite alternate'
+				'glow': 'glow 2s ease-in-out infinite alternate',
+				'pulse-slow': 'pulse-slow 3s ease-in-out infinite'
 			}
 		}
 	},
