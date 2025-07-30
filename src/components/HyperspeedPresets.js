@@ -20,7 +20,7 @@ export const hyperspeedPresets = {
     lightStickHeight: [1.2, 1.6],
     movingAwaySpeed: [70, 90],
     movingCloserSpeed: [-130, -170],
-    carLightsLength: [12, 80],
+    carLightsLength: [400 * 0.03, 400 * 0.2],
     carLightsRadius: [0.04, 0.12],
     carWidthPercentage: [0.3, 0.5],
     carShiftX: [-0.5, 0.5],
