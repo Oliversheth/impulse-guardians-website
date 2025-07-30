@@ -6,9 +6,10 @@ import { siteContent } from '@/data/siteContent';
 import { SplitText } from '@/components/ui/split-text';
 import { CountingNumber } from '@/components/ui/counting-number';
 import { RippleButton } from '@/components/ui/ripple-button';
-import { FloatingParticles } from '@/components/ui/floating-particles';
 import { HoverCardEnhanced } from '@/components/ui/hover-card-enhanced';
-import { AnimatedGradientBackground } from '@/components/ui/animated-gradient-background';
+import { AnimatedWaveBackground } from '@/components/ui/animated-wave-background';
+import { FloatingGeometry } from '@/components/ui/floating-geometry';
+import { DynamicMeshGradient } from '@/components/ui/dynamic-mesh-gradient';
 
 interface HeroProps {
   setActiveSection?: (section: string) => void;
@@ -36,21 +37,23 @@ const Hero = ({ setActiveSection }: HeroProps) => {
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-cerulean-50 to-cactus-50 py-8 overflow-hidden">
-      {/* Animated gradient background */}
-      <AnimatedGradientBackground 
-        colors={['#e0f4ff', '#b3e5ff', '#80d4ff', '#f7f7f6']}
-        speed={0.015}
-        className="opacity-60"
-      />
-      
-      {/* Floating particles background */}
-      <FloatingParticles 
-        particleCount={60} 
-        particleColors={['#0095db', '#00527a', '#b3e5ff', '#80d4ff']}
-        speed={0.4}
-        particleSize={4}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-cerulean-50 to-cactus-50">
+      {/* Multi-Layer Animated Background */}
+      <DynamicMeshGradient 
         className="opacity-40"
+        speed={0.3}
+        nodeCount={5}
+      />
+      <AnimatedWaveBackground 
+        className="opacity-20"
+        speed={0.015}
+        amplitude={60}
+      />
+      <FloatingGeometry 
+        count={12}
+        speed={0.4}
+        maxSize={35}
+        className="opacity-70"
       />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
