@@ -60,9 +60,8 @@ const Hero = ({ setActiveSection }: HeroProps) => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <MagneticButton 
-              variant="default" 
               size="lg" 
-              className="bg-gradient-to-r from-primary to-secondary text-white font-semibold px-8 py-4 text-lg min-w-[200px]"
+              className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
               onClick={() => setActiveSection?.('courses')}
             >
               <BookOpen className="mr-2" />
@@ -72,7 +71,7 @@ const Hero = ({ setActiveSection }: HeroProps) => {
             <MagneticButton 
               variant="outline" 
               size="lg" 
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold px-8 py-4 text-lg min-w-[200px]"
+              className="border-cerulean-600 text-cerulean-600 hover:bg-cerulean-50 px-8 py-4 text-lg"
               onClick={() => setActiveSection?.('ai-assistant')}
             >
               <Bot className="mr-2" />
@@ -180,9 +179,8 @@ const Hero = ({ setActiveSection }: HeroProps) => {
             Start your journey today – it's completely free!
           </p>
           <MagneticButton 
-            variant="default" 
             size="lg" 
-            className="bg-gradient-to-r from-primary to-secondary text-white font-semibold px-8 py-4 text-lg min-w-[200px]"
+            className="bg-cerulean-600 hover:bg-cerulean-700 text-white px-8 py-4 text-lg"
             onClick={() => setActiveSection?.('courses')}
           >
             <BookOpen className="mr-2" />
