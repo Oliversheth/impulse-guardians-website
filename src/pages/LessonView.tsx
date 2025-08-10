@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, ArrowLeft, ArrowRight, Lock, RotateCcw } from 'lucide-react';
@@ -168,14 +167,32 @@ const LessonView = () => {
               <CardTitle>Video Lesson</CardTitle>
             </CardHeader>
             <CardContent>
-              {videoId ? (
-                <YouTubePlayer
-                  videoId={videoId}
-                  onProgressUpdate={handleVideoProgressUpdate}
-                  onVideoCompleted={handleVideoCompleted}
-                  initialProgress={videoProgress}
-                  isCompleted={isVideoCompleted}
-                />
+              {lesson.videoUrl ? (
+                lesson.videoUrl.includes('youtube.com') || lesson.videoUrl.includes('youtu.be') ? (
+                  <YouTubePlayer
+                    videoId={getYouTubeVideoId(lesson.videoUrl)}
+                    onProgressUpdate={handleVideoProgressUpdate}
+                    onVideoCompleted={handleVideoCompleted}
+                    initialProgress={videoProgress}
+                    isCompleted={isVideoCompleted}
+                  />
+                ) : lesson.videoUrl.includes('docs.google.com/presentation') ? (
+                  <iframe
+                    src={lesson.videoUrl}
+                    width="100%"
+                    height="480"
+                    allowFullScreen
+                    frameBorder="0"
+                    title="Lesson Slide"
+                    style={{ borderRadius: 12, marginBottom: 24 }}
+                  />
+                ) : (
+                  <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <p className="text-lg font-semibold">Video not available</p>
+                    </div>
+                  </div>
+                )
               ) : (
                 <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
                   <div className="text-center text-white">
