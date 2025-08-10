@@ -51,7 +51,7 @@ export const coursesData: Course[] = [
         id: 101,
         title: "Income Tracking",
         description: "Learn how to track and categorize all sources of income",
-        videoUrl: "https://docs.google.com/presentation/d/e/2PACX-1vRdRDj99dHaBIDbeAY1ifPj31157alT60bQYgNnJTEPJSzzkjM46RQI-Q-k0qsV9g/pubembed?start=false&loop=false&delayms=3000",
+        videoUrl: "https://docs.google.com/presentation/d/e/2PACX-1vRdRDj99dHaBIDbeAY1ifPj31157alT60bQYgNnJTEPJSzzkjM46RQI-Q-k0qsV9g/pub?start=false&loop=false&delayms=3000&slide=id.p1",
         content: "Understanding your income is the foundation of good budgeting. Learn to track salary, side hustles, investments, and other income sources.",
         duration: "30 min",
         completed: false,
