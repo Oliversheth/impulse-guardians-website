@@ -175,13 +175,15 @@ const LessonView = () => {
                   />
                 ) : lesson.videoUrl.includes('docs.google.com/presentation') ? (
                   <iframe
-                    src={lesson.videoUrl}
-                    width="100%"
-                    height="480"
-                    allowFullScreen
+                    src={lesson.videoUrl.replace('/pub?', '/pubembed?')}
+                    width="1280"
+                    height="749"
+                    allowFullScreen={true}
+                    mozAllowFullScreen={true}
+                    webkitAllowFullScreen={true}
                     frameBorder="0"
                     title="Lesson Slide"
-                    style={{ borderRadius: 12, marginBottom: 24 }}
+                    style={{ borderRadius: 12, marginBottom: 24, width: '100%', maxWidth: '100%' }}
                   />
                 ) : (
                   <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
