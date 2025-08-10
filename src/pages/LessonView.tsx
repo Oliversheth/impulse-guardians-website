@@ -116,9 +116,6 @@ const LessonView = () => {
     return match ? match[1] : null;
   };
 
-  const videoUrl = "https://www.youtube.com/watch?v=50GVPFj66CY";
-  const videoId = getYouTubeVideoId(videoUrl);
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
