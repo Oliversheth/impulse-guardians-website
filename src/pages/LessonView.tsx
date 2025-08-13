@@ -125,7 +125,8 @@ const LessonView = () => {
   };
 
   const videoUrl = lesson.videoUrl || '';
-  const isYouTube = /youtube\.com|youtu\.be/.test(videoUrl);
+  const youTubeId = getYouTubeVideoId(videoUrl);
+  const isYouTube = Boolean(youTubeId);
   const isGoogleSlides = /docs\.google\.com\/presentation/.test(videoUrl);
   const requiresVideoProgress = isYouTube;
   return (
@@ -179,7 +180,7 @@ const LessonView = () => {
               {videoUrl ? (
                 isYouTube ? (
                   <YouTubePlayer
-                    videoId={getYouTubeVideoId(videoUrl) || ''}
+                    videoId={youTubeId || ''}
                     onProgressUpdate={handleVideoProgressUpdate}
                     onVideoCompleted={handleVideoCompleted}
                     initialProgress={videoProgress}
