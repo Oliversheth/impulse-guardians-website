@@ -110,12 +110,24 @@ const LessonView = () => {
     }
   };
 
-  // Extract YouTube video ID from URL
+  // Extract YouTube video ID from URL (supports watch, youtu.be, and embed formats)
   const getYouTubeVideoId = (url: string) => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-    return match ? match[1] : null;
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([^&\n?#]+)/, // watch?v=
+      /(?:youtu\.be\/)([^&\n?#]+)/,              // youtu.be/
+      /(?:youtube\.com\/embed\/)([^&\n?#]+)/     // embed/
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m && m[1]) return m[1];
+    }
+    return null;
   };
 
+  const videoUrl = lesson.videoUrl || '';
+  const isYouTube = /youtube\.com|youtu\.be/.test(videoUrl);
+  const isGoogleSlides = /docs\.google\.com\/presentation/.test(videoUrl);
+  const requiresVideoProgress = isYouTube;
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
@@ -158,29 +170,27 @@ const LessonView = () => {
             </CardHeader>
           </Card>
 
-          {/* Video Section */}
+          {/* Lesson Content Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Video Lesson</CardTitle>
+              <CardTitle>{isGoogleSlides ? 'Lesson Content' : 'Video Lesson'}</CardTitle>
             </CardHeader>
             <CardContent>
-              {lesson.videoUrl ? (
-                lesson.videoUrl.includes('youtube.com') || lesson.videoUrl.includes('youtu.be') ? (
+              {videoUrl ? (
+                isYouTube ? (
                   <YouTubePlayer
-                    videoId={getYouTubeVideoId(lesson.videoUrl)}
+                    videoId={getYouTubeVideoId(videoUrl) || ''}
                     onProgressUpdate={handleVideoProgressUpdate}
                     onVideoCompleted={handleVideoCompleted}
                     initialProgress={videoProgress}
                     isCompleted={isVideoCompleted}
                   />
-                ) : lesson.videoUrl.includes('docs.google.com/presentation') ? (
+                ) : isGoogleSlides ? (
                   <iframe
-                    src={lesson.videoUrl.replace('/pub?', '/pubembed?')}
+                    src={videoUrl.replace('/pub?', '/pubembed?')}
                     width="1280"
                     height="749"
                     allowFullScreen={true}
-                    mozAllowFullScreen={true}
-                    webkitAllowFullScreen={true}
                     frameBorder="0"
                     title="Lesson Slide"
                     style={{ borderRadius: 12, marginBottom: 24, width: '100%', maxWidth: '100%' }}
@@ -188,14 +198,14 @@ const LessonView = () => {
                 ) : (
                   <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
                     <div className="text-center text-white">
-                      <p className="text-lg font-semibold">Video not available</p>
+                      <p className="text-lg font-semibold">Content not available</p>
                     </div>
                   </div>
                 )
               ) : (
                 <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
                   <div className="text-center text-white">
-                    <p className="text-lg font-semibold">Video not available</p>
+                    <p className="text-lg font-semibold">Content not available</p>
                   </div>
                 </div>
               )}
@@ -215,7 +225,7 @@ const LessonView = () => {
               <CardTitle>Knowledge Check</CardTitle>
             </CardHeader>
             <CardContent>
-              {!isVideoCompleted ? (
+              {requiresVideoProgress && !isVideoCompleted ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">
                     Watch at least 90% of the video to unlock the quiz
