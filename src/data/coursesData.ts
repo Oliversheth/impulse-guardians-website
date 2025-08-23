@@ -1439,90 +1439,6 @@ export const coursesData: Course[] = [
           ]
         }
       },
-      {
-        id: 404,
-        title: "Must-Have Apps & Digital Finance Tools",
-        description: "Discover essential apps and tools for managing your finances",
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        content: "Explore the best digital tools and apps to help you budget, save, invest, and manage your financial life.",
-        duration: "30 min",
-        completed: false,
-        quiz: {
-          passingScore: 90,
-          questions: [
-            {
-              id: 1,
-              question: "What type of app helps you track expenses automatically?",
-              options: ["Gaming apps", "Budgeting apps", "Social media apps", "Weather apps"],
-              correctAnswer: 1,
-              explanation: "Budgeting apps can connect to your accounts and automatically categorize transactions."
-            },
-            {
-              id: 2,
-              question: "What should you look for in a financial app?",
-              options: ["Fancy graphics only", "Security, functionality, and good reviews", "Highest price", "Most downloads"],
-              correctAnswer: 1,
-              explanation: "Prioritize security features, useful functionality, and positive user reviews when choosing financial apps."
-            },
-            {
-              id: 3,
-              question: "What's the benefit of investment apps?",
-              options: ["Guaranteed returns", "Easy access to investing with low minimums", "No fees ever", "Automatic profits"],
-              correctAnswer: 1,
-              explanation: "Investment apps make investing accessible with low minimums and user-friendly interfaces."
-            },
-            {
-              id: 4,
-              question: "Should you connect all your accounts to financial apps?",
-              options: ["Always", "Consider security and necessity", "Never", "Only checking accounts"],
-              correctAnswer: 1,
-              explanation: "Consider the app's security measures and whether the benefits outweigh the risks."
-            },
-            {
-              id: 5,
-              question: "What's a robo-advisor?",
-              options: ["A human advisor", "Automated investment management", "A budgeting tool", "A banking app"],
-              correctAnswer: 1,
-              explanation: "Robo-advisors are digital platforms that provide automated investment management services."
-            },
-            {
-              id: 6,
-              question: "What's the advantage of payment apps like Venmo or PayPal?",
-              options: ["Always free", "Convenient money transfers", "Investment opportunities", "Credit building"],
-              correctAnswer: 1,
-              explanation: "Payment apps make it convenient to send and receive money digitally."
-            },
-            {
-              id: 7,
-              question: "Should you pay for financial apps?",
-              options: ["Never pay for apps", "Consider if features justify the cost", "Always pay for better security", "Only free apps are good"],
-              correctAnswer: 1,
-              explanation: "Evaluate whether paid app features provide enough value to justify the cost."
-            },
-            {
-              id: 8,
-              question: "What's important about app permissions?",
-              options: ["Grant all permissions", "Review and only grant necessary ones", "Never grant any", "Permissions don't matter"],
-              correctAnswer: 1,
-              explanation: "Review app permissions carefully and only grant access that's necessary for functionality."
-            },
-            {
-              id: 9,
-              question: "How can apps help with saving?",
-              options: ["They can't help", "Automatic transfers and round-ups", "By spending more", "Only through investments"],
-              correctAnswer: 1,
-              explanation: "Apps can automate savings through features like round-ups and scheduled transfers."
-            },
-            {
-              id: 10,
-              question: "What's a credit monitoring app?",
-              options: ["Tracks spending only", "Monitors credit score and report changes", "Manages credit cards", "Pays bills automatically"],
-              correctAnswer: 1,
-              explanation: "Credit monitoring apps track changes to your credit score and report, alerting you to potential issues."
-            }
-          ]
-        }
-      }
     ]
   },
   {
@@ -1625,90 +1541,6 @@ export const coursesData: Course[] = [
       },
       {
         id: 502,
-        title: "Side Hustles & Passive Income Ideas",
-        description: "Explore ways to earn additional income beyond your primary job",
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        content: "Discover various side hustle opportunities and passive income strategies to boost your earnings.",
-        duration: "40 min",
-        completed: false,
-        quiz: {
-          passingScore: 90,
-          questions: [
-            {
-              id: 1,
-              question: "What's the difference between active and passive income?",
-              options: ["No difference", "Active requires ongoing work, passive doesn't", "Passive is always better", "Active is always taxed higher"],
-              correctAnswer: 1,
-              explanation: "Active income requires ongoing work, while passive income generates money with minimal ongoing effort."
-            },
-            {
-              id: 2,
-              question: "Which is an example of a side hustle?",
-              options: ["Your full-time job", "Freelance writing", "Watching TV", "Sleeping"],
-              correctAnswer: 1,
-              explanation: "Freelance writing is work done outside your main job to earn additional income."
-            },
-            {
-              id: 3,
-              question: "What's an example of passive income?",
-              options: ["Uber driving", "Rental property income", "Freelance work", "Part-time job"],
-              correctAnswer: 1,
-              explanation: "Rental property can generate income without daily active involvement."
-            },
-            {
-              id: 4,
-              question: "What should you consider before starting a side hustle?",
-              options: ["Nothing", "Time, skills, market demand, and employer policies", "Only potential income", "Only time required"],
-              correctAnswer: 1,
-              explanation: "Consider your available time, relevant skills, market demand, and any employer restrictions."
-            },
-            {
-              id: 5,
-              question: "How are side hustle earnings typically taxed?",
-              options: ["Tax-free", "As self-employment income", "Same as regular salary", "Lower tax rate"],
-              correctAnswer: 1,
-              explanation: "Side hustle income is usually subject to self-employment tax in addition to income tax."
-            },
-            {
-              id: 6,
-              question: "What's important about tracking side hustle expenses?",
-              options: ["Not necessary", "Can be tax-deductible", "Only for large businesses", "Only if profitable"],
-              correctAnswer: 1,
-              explanation: "Business expenses for side hustles can often be deducted, reducing your taxable income."
-            },
-            {
-              id: 7,
-              question: "Which platform is commonly used for freelance work?",
-              options: ["Facebook", "Upwork", "Instagram", "YouTube"],
-              correctAnswer: 1,
-              explanation: "Upwork is a popular platform connecting freelancers with clients for various services."
-            },
-            {
-              id: 8,
-              question: "What's a risk of depending too heavily on side hustle income?",
-              options: ["No risks", "Income instability", "Too much money", "Automatic success"],
-              correctAnswer: 1,
-              explanation: "Side hustle income can be unpredictable, so don't rely on it for essential expenses."
-            },
-            {
-              id: 9,
-              question: "How can you turn a hobby into income?",
-              options: ["It's impossible", "Monetize skills through services or products", "Only through employment", "Hobbies can't make money"],
-              correctAnswer: 1,
-              explanation: "Many hobbies can be monetized through teaching, selling products, or offering services."
-            },
-            {
-              id: 10,
-              question: "What's important about scaling a side hustle?",
-              options: ["Always scale immediately", "Consider time investment vs. income potential", "Never scale", "Only scale if full-time"],
-              correctAnswer: 1,
-              explanation: "Evaluate whether the time and effort required to scale provides proportional income benefits."
-            }
-          ]
-        }
-      },
-      {
-        id: 503,
         title: "Negotiating Salary & Growing Your Career",
         description: "Learn to advocate for yourself and advance professionally",
         videoUrl: "https://docs.google.com/presentation/d/e/2PACX-1vSqIj7GhfiDtZwUAmcul1V-WLX7ekrcKvWgGVqhcHrOnt_DehjPeV-fCAhMM0zq-w/pubembed?start=false&loop=false&delayms=3000",
@@ -1792,7 +1624,7 @@ export const coursesData: Course[] = [
         }
       },
       {
-        id: 504,
+        id: 503,
         title: "Planning for Future Income Growth",
         description: "Develop strategies for long-term income and career advancement",
         videoUrl: "https://docs.google.com/presentation/d/e/2PACX-1vShrGteiFnk5QjSJ-3gxLI6oeZt8AJlw4mHTLjzKTN5cyjCVa3Y31_yKgeDvUE70A/pubembed?start=false&loop=false&delayms=3000",
