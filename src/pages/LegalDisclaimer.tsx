@@ -126,7 +126,7 @@ const LegalDisclaimer = () => {
                 <h2 className="text-2xl font-semibold text-cactus-800 mb-4">Contact Information</h2>
                 <p>
                   If you have questions about this disclaimer or need clarification about the educational 
-                  nature of our content, please contact us at info@noimpulse.org.
+                  nature of our content, please contact us at info@noimpulse.finance.
                 </p>
               </section>
 
